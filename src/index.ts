@@ -1,27 +1,3 @@
-// ==UserScript==
-// @name         天鳳牌理好形表示
-// @name:zh      天凤牌理好形表示
-// @name:zh-CN   天凤牌理好形表示
-// @name:zh-TW   天鳳牌理好形表示
-// @name:en      Tenhou-Pairi Kokei display
-// @namespace    http://tanimodori.com/
-// @version      0.0.7
-// @description  天鳳牌理で一向聴の好形率を表示する
-// @description:zh  在天凤牌理中显示好形率
-// @description:zh-CN  在天凤牌理中显示好形率
-// @description:zh-TW  在天鳳牌理中顯示好形率
-// @description:en  Display Kokei percentage of ii-shan-ten in Tenhou-Pairi
-// @author       Tanimodori
-// @match        http://tenhou.net/2/*
-// @match        https://tenhou.net/2/*
-// @include      http://tenhou.net/2/*
-// @include      https://tenhou.net/2/*
-// @grant        none
-// @license      MIT
-// ==/UserScript==
-
-/* jshint esversion:6 */
-
 const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
 const S_Q_QUERY = '標準形(七対国士を含む)の計算結果 / 一般形';
 const S_YIISHANTEN = '1向聴';
@@ -29,13 +5,13 @@ const S_YIISHANTEN_ALL = '標準形1向聴';
 const MJ_RE = /([0-9]+[mpsz])+/gm;
 
 const mjtiles = (input) => {
-  let result = [];
+  const result = [];
   let stk = '';
-  for (let tile_i of input) {
+  for (const tile_i of input) {
     if ('0' <= tile_i && tile_i <= '9') {
       stk += tile_i;
     } else {
-      for (let tile_j of stk) {
+      for (const tile_j of stk) {
         result.push(tile_j + tile_i);
       }
       stk = '';
@@ -66,7 +42,7 @@ const mjaka = (tile) => {
 
 const mjsub = (mjarr, ...tiles) => {
   if (mjarr.mjfail) return;
-  for (let tile of tiles) {
+  for (const tile of tiles) {
     let index = mjarr.indexOf(tile);
     if (index != -1) {
       mjarr.splice(index, 1);
@@ -112,7 +88,7 @@ const mj13orphan = (mjarr) => {
   return false;
 };
 
-let mjagaricache = {};
+const mjagaricache = {};
 
 const mjagari = (mjarr) => {
   if (mjarr.mjfail || mjarr.length % 3 === 1) return false;
@@ -123,18 +99,18 @@ const mjagari = (mjarr) => {
     if (mj7toi([...mjarr])) return true;
     if (mj13orphan([...mjarr])) return true;
   }
-  let joined_result = mjarr.sort(mjcomp).join('').replace('0', '5');
+  const joined_result = mjarr.sort(mjcomp).join('').replace('0', '5');
   if (joined_result in mjagaricache) {
     return mjagaricache[joined_result];
   }
-  let result = mjagari_raw(mjarr);
+  const result = mjagari_raw(mjarr);
   mjagaricache[joined_result] = result;
   return result;
 };
 
 const mjagari_raw = (mjarr) => {
-  let tile = mjarr[0];
-  let [tile_num, tile_type] = tile;
+  const tile = mjarr[0];
+  const [tile_num, tile_type] = tile;
   // toitsu
   if (mjarr.length % 3 === 2) {
     if (mjagari(mjsub([...mjarr], tile, tile), false)) return true;
@@ -145,10 +121,10 @@ const mjagari_raw = (mjarr) => {
   if (tile_type !== 'z') {
     let tile_number = Number(tile_num);
     if (tile_number === 0) tile_number = 5;
-    let shuntsu_tiles_groups = [tile_number - 2, tile_number - 1, tile_number]
+    const shuntsu_tiles_groups = [tile_number - 2, tile_number - 1, tile_number]
       .filter((x) => x >= 1 && x <= 7)
       .map((x) => [x + tile_type, x + 1 + tile_type, x + 2 + tile_type]);
-    for (let s_tiles of shuntsu_tiles_groups) {
+    for (const s_tiles of shuntsu_tiles_groups) {
       if (mjagari(mjsub([...mjarr], ...s_tiles), false)) return true;
     }
   }
@@ -169,16 +145,16 @@ const mjmachi = (mjarr) => {
 
 const mjtenpaikei = (mjarr) => {
   if (mjarr.length % 3 === 1) return {};
-  let result = {};
+  const result = {};
   result.nokori_max = 0;
-  let unique = (value, index, self) => self.indexOf(value) === index;
-  for (let tile of mjarr.filter(unique)) {
-    let machi = mjmachi(mjsub([...mjarr], tile));
+  const unique = (value, index, self) => self.indexOf(value) === index;
+  for (const tile of mjarr.filter(unique)) {
+    const machi = mjmachi(mjsub([...mjarr], tile));
     if (machi.length > 0) {
       result[tile] = {};
       result[tile].nokori = 0;
-      for (let machihai of machi) {
-        let nokori = mjnokori([...mjarr, tile], machihai);
+      for (const machihai of machi) {
+        const nokori = mjnokori([...mjarr, tile], machihai);
         result[tile][machihai] = nokori;
         result[tile].nokori += nokori;
       }
@@ -189,7 +165,7 @@ const mjtenpaikei = (mjarr) => {
 };
 
 const inject_css = () => {
-  let styles = `
+  const styles = `
     .D {
       position: relative;
     }
@@ -226,21 +202,21 @@ const inject_css = () => {
         margin-right: auto;
     }
 `;
-  let styleSheet = document.createElement('style');
+  const styleSheet = document.createElement('style');
   styleSheet.type = 'text/css';
   styleSheet.innerText = styles;
   document.head.appendChild(styleSheet);
 };
 
 const create_node_tile_img = (tile) => {
-  let img_node = document.createElement('img');
+  const img_node = document.createElement('img');
   img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
   img_node.setAttribute('border', '0');
   return img_node;
 };
 
 const create_node_tile = (tile, link) => {
-  let a_node = document.createElement('a');
+  const a_node = document.createElement('a');
   if (link) a_node.setAttribute('href', link);
   a_node.setAttribute('class', 'D');
   a_node.appendChild(create_node_tile_img(tile));
@@ -248,42 +224,42 @@ const create_node_tile = (tile, link) => {
 };
 
 const create_node_td = (...children) => {
-  let td = document.createElement('td');
-  for (let child of children) {
+  const td = document.createElement('td');
+  for (const child of children) {
     td.appendChild(child);
   }
   return td;
 };
 
 const mouse_over_node = (node, info) => {
-  let popups = node.getElementsByClassName('popup');
+  const popups = node.getElementsByClassName('popup');
   let popup;
   if (popups.length === 0) {
     popup = document.createElement('div');
-    let tiles = mjtiles(info.link.substring(3));
-    for (let tile of tiles) {
+    const tiles = mjtiles(info.link.substring(3));
+    for (const tile of tiles) {
       popup.appendChild(create_node_tile_img(tile));
     }
     popup.appendChild(document.createElement('br'));
-    let table = document.createElement('table');
+    const table = document.createElement('table');
     table.setAttribute('cellpadding', 2);
     table.setAttribute('cellspacing', 0);
-    let tbody = document.createElement('tbody');
+    const tbody = document.createElement('tbody');
     table.appendChild(tbody);
-    let keys_valid = Object.keys(info)
+    const keys_valid = Object.keys(info)
       .filter((x) => MJ_TILES.indexOf(x.replace('0', '5')) !== -1)
       .sort((x, y) => {
-        let nokori_diff = info[y].nokori - info[x].nokori;
+        const nokori_diff = info[y].nokori - info[x].nokori;
         return nokori_diff === 0 ? mjcomp(x, y) : nokori_diff;
       });
-    for (let key of keys_valid) {
-      let tr = document.createElement('tr');
-      let info_local = info[key];
+    for (const key of keys_valid) {
+      const tr = document.createElement('tr');
+      const info_local = info[key];
       tr.appendChild(create_node_td(document.createTextNode('打')));
       tr.appendChild(create_node_td(create_node_tile_img(key)));
       tr.appendChild(create_node_td(document.createTextNode('待ち[')));
-      let machis = [];
-      for (let key_local of Object.keys(info_local)) {
+      const machis = [];
+      for (const key_local of Object.keys(info_local)) {
         if (MJ_TILES.indexOf(key_local) === -1) continue;
         machis.push(create_node_tile_img(key_local));
       }
@@ -302,14 +278,14 @@ const mouse_over_node = (node, info) => {
 };
 
 const mouse_out_node = (node) => {
-  let popup = node.getElementsByClassName('popup')[0];
+  const popup = node.getElementsByClassName('popup')[0];
   popup.classList.toggle('show');
 };
 
 const run = () => {
   // check
-  let tehai = document.getElementById('tehai');
-  let m2 = document.getElementById('m2');
+  const tehai = document.getElementById('tehai');
+  const m2 = document.getElementById('m2');
   if (!tehai) return;
   if (!m2) return;
 
@@ -327,23 +303,23 @@ const run = () => {
   }
 
   // parse hands
-  let info = m2.getElementsByTagName('textarea')[0].textContent;
-  let matches = info.match(MJ_RE).map(mjtiles);
+  const info = m2.getElementsByTagName('textarea')[0].textContent;
+  const matches = info.match(MJ_RE).map(mjtiles);
 
   // calculate tenpaikei
-  let hands = matches[0].sort(mjcomp);
-  let tenpaikeis = {};
+  const hands = matches[0].sort(mjcomp);
+  const tenpaikeis = {};
   for (let i = 1; i < matches.length; i += 2) {
-    let sutehai = matches[i][0];
-    let tsumohais = matches[i + 1];
-    let tenpaikeis_local = {};
+    const sutehai = matches[i][0];
+    const tsumohais = matches[i + 1];
+    const tenpaikeis_local = {};
     tenpaikeis_local.koukei = 0;
     tenpaikeis_local.gukei = 0;
     tenpaikeis_local.koukeihais = [];
     tenpaikeis_local.gukeihais = [];
-    for (let tsumohai of tsumohais) {
-      let hands_local = [...mjsub([...hands], sutehai), tsumohai];
-      let tenpaikei_local = mjtenpaikei(hands_local);
+    for (const tsumohai of tsumohais) {
+      const hands_local = [...mjsub([...hands], sutehai), tsumohai];
+      const tenpaikei_local = mjtenpaikei(hands_local);
       tenpaikei_local.link = '?' + (global_show_all_result ? 'q' : 'p') + '=' + hands_local.join('');
       tenpaikei_local.nokori_self = mjnokori(hands, tsumohai);
       if (tenpaikei_local.nokori_max > 4) {
@@ -360,27 +336,27 @@ const run = () => {
 
   // display tenpaikei
   inject_css();
-  let trs = m2.getElementsByTagName('tr');
-  let sutehais = Object.keys(tenpaikeis);
+  const trs = m2.getElementsByTagName('tr');
+  const sutehais = Object.keys(tenpaikeis);
   for (let i = 0; i < sutehais.length; ++i) {
-    let tr = trs[i];
-    let tds = tr.children;
-    let tenpaikeis_local = tenpaikeis[sutehais[i]];
+    const tr = trs[i];
+    const tds = tr.children;
+    const tenpaikeis_local = tenpaikeis[sutehais[i]];
     tr.removeChild(tds[3]);
     tr.removeChild(tds[3]);
-    let td_anchor = tds[3];
-    let nokori_all = tenpaikeis_local.koukei + tenpaikeis_local.gukei;
+    const td_anchor = tds[3];
+    const nokori_all = tenpaikeis_local.koukei + tenpaikeis_local.gukei;
     // modify
     // koukei
     if (tenpaikeis_local.koukei > 0) {
-      let td_node = create_node_td();
-      for (let koukeihai of tenpaikeis_local.koukeihais) {
+      const td_node = create_node_td();
+      for (const koukeihai of tenpaikeis_local.koukeihais) {
         td_node.appendChild(create_node_tile(koukeihai, tenpaikeis_local[koukeihai].link));
       }
       tr.insertBefore(td_node, td_anchor);
       for (let i = 0; i < tenpaikeis_local.koukeihais.length; ++i) {
-        let a_node = td_node.children[i];
-        let koukeihai = tenpaikeis_local.koukeihais[i];
+        const a_node = td_node.children[i];
+        const koukeihai = tenpaikeis_local.koukeihais[i];
         a_node.addEventListener('mouseover', (e) => mouse_over_node(a_node, tenpaikeis_local[koukeihai]));
         a_node.addEventListener('mouseout', (e) => mouse_out_node(a_node));
       }
@@ -397,14 +373,14 @@ const run = () => {
     }
     // gukei
     if (tenpaikeis_local.gukei > 0) {
-      let td_node = create_node_td();
-      for (let gukeihai of tenpaikeis_local.gukeihais) {
+      const td_node = create_node_td();
+      for (const gukeihai of tenpaikeis_local.gukeihais) {
         td_node.appendChild(create_node_tile(gukeihai, tenpaikeis_local[gukeihai].link));
       }
       tr.insertBefore(td_node, td_anchor);
       for (let i = 0; i < tenpaikeis_local.gukeihais.length; ++i) {
-        let a_node = td_node.children[i];
-        let gukeihai = tenpaikeis_local.gukeihais[i];
+        const a_node = td_node.children[i];
+        const gukeihai = tenpaikeis_local.gukeihais[i];
         a_node.addEventListener('mouseover', (e) => mouse_over_node(a_node, tenpaikeis_local[gukeihai]));
         a_node.addEventListener('mouseout', (e) => mouse_out_node(a_node));
       }
