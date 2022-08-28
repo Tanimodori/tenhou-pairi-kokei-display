@@ -1,8 +1,14 @@
 {
   "name": "tenhou-pairi-kokei-display",
-  "version": "0.0.0",
+  "version": "0.0.7",
   "description": "Display Kokei percentage of ii-shan-ten in Tenhou-Pairi",
   "main": "dist/index.js",
+  "files": [
+    "src",
+    "dist",
+    "build",
+    "vite.config.ts"
+  ],
   "scripts": {
     "build": "vite build",
     "test": "vitest"
