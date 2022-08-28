@@ -1,0 +1,23 @@
+{
+  "name": "tenhou-pairi-kokei-display",
+  "version": "0.0.0",
+  "description": "Display Kokei percentage of ii-shan-ten in Tenhou-Pairi",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tanimodori/tenhou-pairi-kokei-display.git"
+  },
+  "keywords": [
+    "tenhou",
+    "greasyfork"
+  ],
+  "author": "Tanimodori",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tanimodori/tenhou-pairi-kokei-display/issues"
+  },
+  "homepage": "https://github.com/Tanimodori/tenhou-pairi-kokei-display#readme"
+}
