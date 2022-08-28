@@ -1,10 +1,24 @@
-const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
-const S_Q_QUERY = '標準形(七対国士を含む)の計算結果 / 一般形';
-const S_YIISHANTEN = '1向聴';
-const S_YIISHANTEN_ALL = '標準形1向聴';
-const MJ_RE = /([0-9]+[mpsz])+/gm;
+/** String in the webpage to check if calculating normal forms */
+export const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
+/** String in the webpage to check if calculating standard forms */
+export const S_Q_QUERY = '標準形(七対国士を含む)の計算結果 / 一般形';
+/** String in the webpage to check if it is ii-shan-ten */
+export const S_YIISHANTEN = '1向聴';
+/** String in the webpage to check if it is ii-shan-ten of standard forms */
+export const S_YIISHANTEN_ALL = '標準形1向聴';
+/** Regexp of all valid tiles */
+export const MJ_RE = /([0-9]+[mpsz])+/gm;
 
-const mjtiles = (input) => {
+/**
+ * Split a hand into tiles array
+ * @param input the hand to be split
+ * @returns the tiles array of the hand
+ * @example
+ * ```ts
+ * mjtiles('12m3s0p5z'); // -> ['1m', '2m', '3s', '0p', '5z']
+ * ```
+ */
+export const mjtiles = (input: string) => {
   const result = [];
   let stk = '';
   for (const tile_i of input) {
@@ -20,7 +34,19 @@ const mjtiles = (input) => {
   return result;
 };
 
-const mjcomp = (a, b) => {
+/**
+ * Compare two tiles for sorting
+ * @param a the lhs tile to compare
+ * @param b the rhs tile to compare
+ * @returns the comparison result
+ * @example
+ * ```ts
+ * mjcomp('5s', '6s'); // -> -1
+ * mjcomp('5m', '5p'); // -> -1
+ * mjcomp('5m', '0m'); // -> 0
+ * ```
+ */
+export const mjcomp = (a: string, b: string) => {
   let [a_n, a_t] = a;
   let [b_n, b_t] = b;
   if (a_n === '0') a_n = 5.5;
@@ -28,19 +54,44 @@ const mjcomp = (a, b) => {
   return a_t !== b_t ? (a_t < b_t ? -1 : 1) : Number(a_n) - Number(b_n);
 };
 
-const MJ_13ORPHAN_TILES = mjtiles('19m19s19p1234567z');
-const MJ_TILES = mjtiles('123456789m123456789s123456789p1234567z');
+/** All orphan tiles */
+export const MJ_13ORPHAN_TILES = mjtiles('19m19s19p1234567z');
+/** All tiles except akadora */
+export const MJ_TILES = mjtiles('123456789m123456789s123456789p1234567z');
 
-let global_show_all_result = false;
+/**
+ * If true, we are calculating standard forms.
+ * i.e. 7 pairs or 13 orphans are included.
+ */
+export let global_show_all_result = false;
 
-const mjaka = (tile) => {
+/**
+ * Transform the tile to the equivalent akadora or non-akadora form
+ * @param tile the tile to transform
+ * @returns the equivalent akadora or non-akadora form
+ * If the tile has no akadora or non-akadora form,
+ * i.e. not one of '50m50s50p', output as-is.
+ */
+export const mjaka = (tile: string) => {
   if (tile[0] === '0' || tile[0] === '5') {
     return String(5 - Number(tile[0])) + tile[1];
   }
   return tile;
 };
 
-const mjsub = (mjarr, ...tiles) => {
+/**
+ * The array of mj tiles, with `mjfail` indicating whether it is valid
+ * @deprecated
+ */
+export type MJArray = string[] & { mjfail: boolean };
+
+/**
+ * Subtract tiles from existing array of tiles.
+ * @param mjarr the array of tiles to be subtracted from
+ * @param tiles the array of tiles to be subtracted by
+ * @returns the result of subtraction
+ */
+export const mjsub = (mjarr: MJArray, ...tiles: string[]) => {
   if (mjarr.mjfail) return;
   for (const tile of tiles) {
     let index = mjarr.indexOf(tile);
@@ -59,7 +110,12 @@ const mjsub = (mjarr, ...tiles) => {
   return mjarr;
 };
 
-const mj7toi = (mjarr) => {
+/**
+ * Detemine if the hand is a win-hand of 7 pairs
+ * @param mjarr the hand
+ * @returns `true` if the hand is a win-hand of 7 pairs, `false` otherwise
+ */
+export const mj7toi = (mjarr: MJArray) => {
   if (mjarr.length != 14) {
     return false;
   }
@@ -77,7 +133,12 @@ const mj7toi = (mjarr) => {
   return true;
 };
 
-const mj13orphan = (mjarr) => {
+/**
+ * Detemine if the hand is a win-hand of 13 orphans
+ * @param mjarr the hand
+ * @returns `true` if the hand is a win-hand of 13 orphans, `false` otherwise
+ */
+export const mj13orphan = (mjarr: MJArray) => {
   if (mjarr.length != 14) {
     return false;
   }
@@ -88,9 +149,15 @@ const mj13orphan = (mjarr) => {
   return false;
 };
 
-const mjagaricache = {};
+/** Cache for a hand if it is valid */
+const mjagaricache: Record<string, boolean> = {};
 
-const mjagari = (mjarr) => {
+/**
+ * Detemine if the hand is a win-hand (Cached version)
+ * @param mjarr the hand
+ * @returns `true` if the hand is a win-hand , `false` otherwise
+ */
+export const mjagari = (mjarr: MJArray) => {
   if (mjarr.mjfail || mjarr.length % 3 === 1) return false;
   if (mjarr.length == 0) {
     return true;
@@ -108,7 +175,12 @@ const mjagari = (mjarr) => {
   return result;
 };
 
-const mjagari_raw = (mjarr) => {
+/**
+ * Detemine if the hand is a win-hand (Non-cached version)
+ * @param mjarr the hand
+ * @returns `true` if the hand is a win-hand , `false` otherwise
+ */
+export const mjagari_raw = (mjarr: MJArray) => {
   const tile = mjarr[0];
   const [tile_num, tile_type] = tile;
   // toitsu
@@ -131,11 +203,22 @@ const mjagari_raw = (mjarr) => {
   return false;
 };
 
-const mjnokori = (mjarr, tile) => {
+/**
+ * Find the remaining count of same tile in the remaining tiles
+ * @param mjarr the known hand
+ * @param tile the tile to search
+ * @returns the remaining count
+ */
+export const mjnokori = (mjarr: MJArray, tile: string) => {
   return 4 - mjarr.filter((x) => x === tile || x === mjaka(tile)).length;
 };
 
-const mjmachi = (mjarr) => {
+/**
+ * Find the waiting tiles of the given hand
+ * @param mjarr the hand
+ * @returns the waiting tiles
+ */
+export const mjmachi = (mjarr: MJArray) => {
   if (mjarr.length % 3 !== 1) return [];
   return MJ_TILES.filter((tile) => {
     if (mjnokori(mjarr, tile) === 0) return false; // ikasama
@@ -143,9 +226,27 @@ const mjmachi = (mjarr) => {
   });
 };
 
-const mjtenpaikei = (mjarr) => {
+/** The waiting forms of a hand */
+export interface Tenpaikei {
+  /** Maxinum count of waiting tiles of all possible forms*/
+  nokori_max: number;
+  /** Waiting forms of the hand after discard the `tile` */
+  [tile: string]: {
+    /** Counting waiting tiles of the waiting form */
+    [machi: string]: number;
+    /** Counting all waiting tiles of the waiting form */
+    nokori: number;
+  };
+}
+
+/**
+ * Find waiting forms of the given hand
+ * @param mjarr the hand
+ * @returns the waiting forms
+ */
+export const mjtenpaikei = (mjarr: MJArray) => {
   if (mjarr.length % 3 === 1) return {};
-  const result = {};
+  const result = {} as Tenpaikei;
   result.nokori_max = 0;
   const unique = (value, index, self) => self.indexOf(value) === index;
   for (const tile of mjarr.filter(unique)) {
@@ -164,7 +265,8 @@ const mjtenpaikei = (mjarr) => {
   return result;
 };
 
-const inject_css = () => {
+/** Inject Css style to the page */
+export const inject_css = () => {
   const styles = `
     .D {
       position: relative;
@@ -208,14 +310,25 @@ const inject_css = () => {
   document.head.appendChild(styleSheet);
 };
 
-const create_node_tile_img = (tile) => {
+/**
+ * Creating tile image element of given tile
+ * @param tile the tile
+ * @returns the image element
+ */
+export const create_node_tile_img = (tile: string) => {
   const img_node = document.createElement('img');
   img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
   img_node.setAttribute('border', '0');
   return img_node;
 };
 
-const create_node_tile = (tile, link) => {
+/**
+ * Create a hyperlink element with image element children of giben tile
+ * @param tile the tile
+ * @param link the `href` attribute of `<a>` element
+ * @returns the hyperlink element
+ */
+export const create_node_tile = (tile: string, link: string) => {
   const a_node = document.createElement('a');
   if (link) a_node.setAttribute('href', link);
   a_node.setAttribute('class', 'D');
@@ -223,7 +336,12 @@ const create_node_tile = (tile, link) => {
   return a_node;
 };
 
-const create_node_td = (...children) => {
+/**
+ * Create a table data element with given children nodes
+ * @param children children of table data element
+ * @returns the created table data element
+ */
+export const create_node_td = (...children: HTMLElement[]) => {
   const td = document.createElement('td');
   for (const child of children) {
     td.appendChild(child);
@@ -231,7 +349,12 @@ const create_node_td = (...children) => {
   return td;
 };
 
-const mouse_over_node = (node, info) => {
+/**
+ * Append popup to the node on mouse over
+ * @param node the target of event
+ * @param info the tenpaikei of the node
+ */
+const mouse_over_node = (node: HTMLElement, info: Tenpaikei & { link: string }) => {
   const popups = node.getElementsByClassName('popup');
   let popup;
   if (popups.length === 0) {
@@ -277,11 +400,18 @@ const mouse_over_node = (node, info) => {
   popup.classList.toggle('show');
 };
 
-const mouse_out_node = (node) => {
+/**
+ * Hide popup on mouse out event
+ * @param node the event target
+ */
+const mouse_out_node = (node: HTMLElement) => {
   const popup = node.getElementsByClassName('popup')[0];
   popup.classList.toggle('show');
 };
 
+/**
+ * The main function of script
+ */
 const run = () => {
   // check
   const tehai = document.getElementById('tehai');
