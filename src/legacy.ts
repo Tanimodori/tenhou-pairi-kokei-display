@@ -55,9 +55,9 @@ export const mjcomp = (a: string, b: string) => {
 };
 
 /** All orphan tiles */
-export const MJ_13ORPHAN_TILES = mjtiles('19m19s19p1234567z');
+export const MJ_13ORPHAN_TILES = mjtiles('19m19p19s1234567z');
 /** All tiles except akadora */
-export const MJ_TILES = mjtiles('123456789m123456789s123456789p1234567z');
+export const MJ_TILES = mjtiles('123456789m123456789p123456789s1234567z');
 
 /**
  * If true, we are calculating standard forms.
