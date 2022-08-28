@@ -1,5 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { resetMjagari, mj13orphan, mj7toi, mjaka, MJArray, mjcomp, mjsub, mjtiles, mjagari } from 'src/legacy';
+import {
+  type MJArray,
+  resetMjagari,
+  mj13orphan,
+  mj7toi,
+  mjaka,
+  mjcomp,
+  mjsub,
+  mjtiles,
+  mjagari,
+  mjnokori,
+} from 'src/legacy';
 
 describe('mjtiles', () => {
   it('can split tiles', () => {
@@ -123,5 +134,21 @@ describe('mjagari', () => {
     // special hands
     expect(testHand('1122m3344556677p', false)).toBe(false);
     expect(testHand('19m19p19s12345677z', false)).toBe(false);
+  });
+});
+
+describe('mjnokori', () => {
+  const getHand = (tiles = '15m50p550s5555z') => {
+    const hand = mjtiles(tiles) as MJArray;
+    hand.mjfail = false;
+    return hand;
+  };
+  it('can calculate remaining tile count', () => {
+    const hand = getHand();
+    expect(mjnokori(hand, '1m')).toBe(3);
+    expect(mjnokori(hand, '0m')).toBe(3);
+    expect(mjnokori(hand, '5p')).toBe(2);
+    expect(mjnokori(hand, '5s')).toBe(1);
+    expect(mjnokori(hand, '5z')).toBe(0);
   });
 });
