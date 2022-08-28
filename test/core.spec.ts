@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mj13orphan, mj7toi, mjaka, MJArray, mjcomp, mjsub, mjtiles } from 'src/legacy';
+import { resetMjagari, mj13orphan, mj7toi, mjaka, MJArray, mjcomp, mjsub, mjtiles, mjagari } from 'src/legacy';
 
 describe('mjtiles', () => {
   it('can split tiles', () => {
@@ -72,14 +72,14 @@ describe('mj7toi', () => {
     // 13 orphans is not 7 pairs
     expect(testHand('19m19p19s12345677z')).toBe(false);
     // 13 tiles is not 7 pairs
-    expect(testHand('1122334455667p')).toBe(false);
+    expect(testHand('1122m334455667p')).toBe(false);
     // 7 pairs should not contain same pairs
     // (bugs fixed in 0.0.7)
-    expect(testHand('11223344555577p')).toBe(false);
-    expect(testHand('11223344555077p')).toBe(false);
+    expect(testHand('1122m3344555577p')).toBe(false);
+    expect(testHand('1122m3344555077p')).toBe(false);
     // correct 7 pairs with akadoras
     // (bugs fixed in 0.0.3)
-    expect(testHand('11223344506677p')).toBe(true);
+    expect(testHand('1122m3344506677p')).toBe(true);
   });
 });
 
@@ -89,14 +89,39 @@ describe('mj13orphan', () => {
     hand.mjfail = false;
     return mj13orphan(hand);
   };
-  it('should calculate winning hands correctly', () => {
+  it('can calculate winning hands', () => {
     // normal hands is not 13 orphans
     expect(testHand('123456789s12344p')).toBe(false);
     // 7 pairs is not 13 orphans
-    expect(testHand('11223344556677p')).toBe(false);
+    expect(testHand('1122m3344556677p')).toBe(false);
     // 13 tiles is not 13 orphans
     expect(testHand('19m19p19s1234567z')).toBe(false);
     // correct 13 orphans
     expect(testHand('19m19p19s12345677z')).toBe(true);
+  });
+});
+
+describe('mjagari', () => {
+  const testHand = (tiles: string, show_all_result = true) => {
+    resetMjagari(show_all_result);
+    const hand = mjtiles(tiles) as MJArray;
+    hand.mjfail = false;
+    return mjagari(hand, show_all_result);
+  };
+  it('can calulate winning hands (standard hands)', () => {
+    // normal hands
+    expect(testHand('123456789m12344p')).toBe(true);
+    expect(testHand('123456789m12345p')).toBe(false);
+    // special hands
+    expect(testHand('1122m3344556677p')).toBe(true);
+    expect(testHand('19m19p19s12345677z')).toBe(true);
+  });
+  it('can calulate winning hands (normal hands)', () => {
+    // normal hands
+    expect(testHand('123456789m12344p', false)).toBe(true);
+    expect(testHand('123456789m12345p', false)).toBe(false);
+    // special hands
+    expect(testHand('1122m3344556677p', false)).toBe(false);
+    expect(testHand('19m19p19s12345677z', false)).toBe(false);
   });
 });
