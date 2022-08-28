@@ -145,7 +145,7 @@ export const mj13orphan = (mjarr: MJArray) => {
   if (mjarr.length != 14) {
     return false;
   }
-  mjsub(mjarr, MJ_13ORPHAN_TILES);
+  mjsub(mjarr, ...MJ_13ORPHAN_TILES);
   if (!mjarr.mjfail && MJ_13ORPHAN_TILES.indexOf(mjarr[0]) !== -1) {
     return true;
   }
