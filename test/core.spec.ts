@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mjaka, MJArray, mjcomp, mjsub, mjtiles } from 'src/legacy';
+import { mj7toi, mjaka, MJArray, mjcomp, mjsub, mjtiles } from 'src/legacy';
 
 describe('mjtiles', () => {
   it('can split tiles', () => {
@@ -57,5 +57,28 @@ describe('mjsub', () => {
 
   it('should fail when no tile can be subtracted', () => {
     expect(mjsub(getHand(), '5z')?.mjfail).toBe(true);
+  });
+});
+
+describe('mj7toi', () => {
+  const testHand = (tiles: string) => {
+    const hand = mjtiles(tiles) as MJArray;
+    hand.mjfail = false;
+    return mj7toi(hand);
+  };
+  it('should calculate winning hands correctly', () => {
+    // normal hands is not 7 pairs
+    expect(testHand('123456789s12344p')).toBe(false);
+    // 13 orphans is not 7 pairs
+    expect(testHand('19m19p19s12345677z')).toBe(false);
+    // 13 tiles is not 7 pairs
+    expect(testHand('1122334455667p')).toBe(false);
+    // 7 pairs should not contain same pairs
+    // (bugs fixed in 0.0.7)
+    expect(testHand('11223344555577p')).toBe(false);
+    expect(testHand('11223344555077p')).toBe(false);
+    // correct 7 pairs with akadoras
+    // (bugs fixed in 0.0.3)
+    expect(testHand('11223344506677p')).toBe(true);
   });
 });
