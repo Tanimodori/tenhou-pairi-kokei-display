@@ -31,17 +31,29 @@ const metadata = `// ==UserScript==
 const plugin: PluginOption = {
   name: 'vite-plugin-greasyfork-metadata',
   writeBundle(options, bundle) {
-    for (const fileName in bundle) {
-      if (fileName !== 'index.js') {
-        return;
-      }
-      const chunk = bundle[fileName];
-      if (!('code' in chunk)) {
-        return;
-      }
-      const outputFileName = options.dir ? resolve(options.dir, fileName) : fileName;
-      fs.writeFileSync(outputFileName, metadata + chunk.code);
+    // get entry file name
+    let entryFileNames = options.entryFileNames;
+    if (typeof entryFileNames === 'function') {
+      console.log(`[greasyfork-metadata] cannot resolve entryFileNames, using 'index.js'`);
+      entryFileNames = 'index.js';
     }
+
+    // get entry file code
+    if (!(entryFileNames in bundle)) {
+      console.log(`[greasyfork-metadata] cannot resolve entryFileNames code`);
+      return;
+    }
+    const chunk = bundle[entryFileNames];
+    if (!('code' in chunk)) {
+      console.log(`[greasyfork-metadata] cannot resolve entryFileNames code`);
+      return;
+    }
+
+    // get output file name
+    const outputFileName = options.dir ? resolve(options.dir, entryFileNames) : entryFileNames;
+
+    // overwrite bundle
+    fs.writeFileSync(outputFileName, metadata + chunk.code);
   },
 };
 
