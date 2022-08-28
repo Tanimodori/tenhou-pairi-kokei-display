@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mj7toi, mjaka, MJArray, mjcomp, mjsub, mjtiles } from 'src/legacy';
+import { mj13orphan, mj7toi, mjaka, MJArray, mjcomp, mjsub, mjtiles } from 'src/legacy';
 
 describe('mjtiles', () => {
   it('can split tiles', () => {
@@ -80,5 +80,23 @@ describe('mj7toi', () => {
     // correct 7 pairs with akadoras
     // (bugs fixed in 0.0.3)
     expect(testHand('11223344506677p')).toBe(true);
+  });
+});
+
+describe('mj13orphan', () => {
+  const testHand = (tiles: string) => {
+    const hand = mjtiles(tiles) as MJArray;
+    hand.mjfail = false;
+    return mj13orphan(hand);
+  };
+  it('should calculate winning hands correctly', () => {
+    // normal hands is not 13 orphans
+    expect(testHand('123456789s12344p')).toBe(false);
+    // 7 pairs is not 13 orphans
+    expect(testHand('11223344556677p')).toBe(false);
+    // 13 tiles is not 13 orphans
+    expect(testHand('19m19p19s1234567z')).toBe(false);
+    // correct 13 orphans
+    expect(testHand('19m19p19s12345677z')).toBe(true);
   });
 });
