@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mjcomp, mjtiles } from 'src/legacy';
+import { mjaka, mjcomp, mjtiles } from 'src/legacy';
 
 describe('Test tiles manipulating functions', () => {
   it('mjtiles: can split tiles', () => {
@@ -16,5 +16,12 @@ describe('Test tiles manipulating functions', () => {
     expect(mjcomp('9m', '1p')).toBeLessThan(0);
     expect(mjcomp('9p', '1s')).toBeLessThan(0);
     expect(mjcomp('9s', '1z')).toBeLessThan(0);
+  });
+
+  it('mjaka: can convert akadoras', () => {
+    expect(mjaka('5m')).toBe('0m');
+    expect(mjaka('0m')).toBe('5m');
+    expect(mjaka('5z')).toBe('5z');
+    expect(mjaka('6s')).toBe('6s');
   });
 });
