@@ -153,19 +153,19 @@ export const mj13orphan = (mjarr: MJArray) => {
 };
 
 /** Cache for a hand if it is valid */
-const mjagaricache: Record<string, boolean> = {};
+let mjagaricache: Record<string, boolean> = {};
 
 /**
  * Detemine if the hand is a win-hand (Cached version)
  * @param mjarr the hand
  * @returns `true` if the hand is a win-hand , `false` otherwise
  */
-export const mjagari = (mjarr: MJArray) => {
+export const mjagari = (mjarr: MJArray, show_all_result = global_show_all_result) => {
   if (mjarr.mjfail || mjarr.length % 3 === 1) return false;
   if (mjarr.length == 0) {
     return true;
   }
-  if (global_show_all_result) {
+  if (show_all_result) {
     if (mj7toi([...mjarr])) return true;
     if (mj13orphan([...mjarr])) return true;
   }
@@ -204,6 +204,16 @@ export const mjagari_raw = (mjarr: MJArray) => {
     }
   }
   return false;
+};
+
+/**
+ * Temp fix for testing mjagari
+ * TODO: remove global variables
+ * @param show_all_result value set to `global_show_all_result`
+ */
+export const resetMjagari = (show_all_result = global_show_all_result) => {
+  global_show_all_result = show_all_result;
+  mjagaricache = {};
 };
 
 /**
