@@ -19,5 +19,15 @@
   "bugs": {
     "url": "https://github.com/Tanimodori/tenhou-pairi-kokei-display/issues"
   },
-  "homepage": "https://github.com/Tanimodori/tenhou-pairi-kokei-display#readme"
+  "homepage": "https://github.com/Tanimodori/tenhou-pairi-kokei-display#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.2",
+    "vite": "^3.0.9",
+    "vitest": "^0.22.1"
+  }
 }
