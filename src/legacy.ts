@@ -73,6 +73,9 @@ export let global_show_all_result = false;
  * i.e. not one of '50m50s50p', output as-is.
  */
 export const mjaka = (tile: string) => {
+  if ('msp'.indexOf(tile[1]) === -1) {
+    return tile;
+  }
   if (tile[0] === '0' || tile[0] === '5') {
     return String(5 - Number(tile[0])) + tile[1];
   }
