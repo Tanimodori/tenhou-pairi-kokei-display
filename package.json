@@ -4,6 +4,7 @@
   "description": "Display Kokei percentage of ii-shan-ten in Tenhou-Pairi",
   "main": "dist/index.js",
   "scripts": {
+    "build": "vite build",
     "test": "vitest"
   },
   "repository": {
