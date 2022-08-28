@@ -43,7 +43,7 @@ export const mjtiles = (input: string) => {
  * ```ts
  * mjcomp('5s', '6s'); // -> -1
  * mjcomp('5m', '5p'); // -> -1
- * mjcomp('5m', '0m'); // -> 0
+ * mjcomp('5m', '0m'); // -> -0.5, '0m' is between '56m'
  * ```
  */
 export const mjcomp = (a: string, b: string) => {
