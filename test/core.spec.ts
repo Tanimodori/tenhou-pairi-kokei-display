@@ -10,6 +10,7 @@ import {
   mjtiles,
   mjagari,
   mjnokori,
+  mjmachi,
 } from 'src/legacy';
 
 describe('mjtiles', () => {
@@ -150,5 +151,35 @@ describe('mjnokori', () => {
     expect(mjnokori(hand, '5p')).toBe(2);
     expect(mjnokori(hand, '5s')).toBe(1);
     expect(mjnokori(hand, '5z')).toBe(0);
+  });
+});
+
+describe('mjmachi', () => {
+  const testHand = (tiles: string, show_all_result = true) => {
+    resetMjagari(show_all_result);
+    const hand = mjtiles(tiles) as MJArray;
+    hand.mjfail = false;
+    return mjmachi(hand);
+  };
+
+  // [hand, standard, normal]
+  const cases: [string, string, string][] = [
+    // trivial hands
+    ['123456789m23p11z', '14p', '14p'],
+    ['123456789m1112z', '2z', '2z'],
+    ['1122m334455667p', '7p', ''],
+    ['19m19p19s1234567z', '19m19p19s1234567z', ''],
+  ];
+
+  it('can calulate waiting tiles (standard hands)', () => {
+    for (const [hand, standard] of cases) {
+      expect(testHand(hand)).toEqual(mjtiles(standard));
+    }
+  });
+
+  it('can calulate waiting tiles (normal hands)', () => {
+    for (const [hand, _standard, normal] of cases) {
+      expect(testHand(hand, false)).toEqual(mjtiles(normal));
+    }
   });
 });
