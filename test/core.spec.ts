@@ -120,21 +120,17 @@ describe('mjagari', () => {
     hand.mjfail = false;
     return mjagari(hand, show_all_result);
   };
-  it('can calulate winning hands (standard hands)', () => {
-    // normal hands
-    expect(testHand('123456789m12344p')).toBe(true);
-    expect(testHand('123456789m12345p')).toBe(false);
-    // special hands
-    expect(testHand('1122m3344556677p')).toBe(true);
-    expect(testHand('19m19p19s12345677z')).toBe(true);
-  });
-  it('can calulate winning hands (normal hands)', () => {
-    // normal hands
-    expect(testHand('123456789m12344p', false)).toBe(true);
-    expect(testHand('123456789m12345p', false)).toBe(false);
-    // special hands
-    expect(testHand('1122m3344556677p', false)).toBe(false);
-    expect(testHand('19m19p19s12345677z', false)).toBe(false);
+
+  // [hand, standard, normal]
+  const cases: [string, boolean, boolean][] = [
+    ['123456789m12344p', true, true],
+    ['123456789m12345p', false, false],
+    ['1122m3344556677p', true, false],
+    ['19m19p19s12345677z', true, false],
+  ];
+  it.each(cases)('can calulate winning hands', (hand, standard, normal) => {
+    expect(testHand(hand)).toBe(standard);
+    expect(testHand(hand, false)).toBe(normal);
   });
 });
 
@@ -164,22 +160,27 @@ describe('mjmachi', () => {
 
   // [hand, standard, normal]
   const cases: [string, string, string][] = [
-    // trivial hands
+    /** Trivial hands */
+    // ryanmen
     ['123456789m23p11z', '14p', '14p'],
+    // kanchan
+    ['123456789m13p11z', '2p', '2p'],
+    // penchan
+    ['123456789m12p11z', '3p', '3p'],
+    // shanpon
+    ['123456789m1122z', '12z', '12z'],
+    // tanki
     ['123456789m1112z', '2z', '2z'],
+    // 7 pairs
     ['1122m334455667p', '7p', ''],
+    // 13 orphans
     ['19m19p19s1234567z', '19m19p19s1234567z', ''],
+    /** complex hands */
+    ['11123m44p111222z', '14m4p', '14m4p'],
   ];
 
-  it('can calulate waiting tiles (standard hands)', () => {
-    for (const [hand, standard] of cases) {
-      expect(testHand(hand)).toEqual(mjtiles(standard));
-    }
-  });
-
-  it('can calulate waiting tiles (normal hands)', () => {
-    for (const [hand, _standard, normal] of cases) {
-      expect(testHand(hand, false)).toEqual(mjtiles(normal));
-    }
+  it.each(cases)('can calulate waiting tiles', (hand, standard, normal) => {
+    expect(testHand(hand)).toEqual(mjtiles(standard));
+    expect(testHand(hand, false)).toEqual(mjtiles(normal));
   });
 });
