@@ -213,6 +213,51 @@ const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
   });
 };
 
+buildM2Div;
+/**
+ * Get the textarea content
+ * @param testCase the test case
+ */
+const getTextAreaContent = (testCase: TestCase) => {
+  // It uses `testCase.input`, not `testCase.tiles`
+  const firstLine = `${testCase.input}\n`;
+  const mainLines = testCase.calculated.result.map(
+    ([discard, tiles, count]) => `打${discard} 摸[${mjtiles(tiles).join('')} ${count}枚]`,
+  );
+  return firstLine + mainLines.join('\n');
+};
+
+/**
+ * Build the `div#m2` of website
+ * @param document the window document object
+ * @param testCase the test case
+ */
+const buildM2Div = (document: Document, testCase: TestCase) => {
+  const standardFormText = [`標準形(七対国士を含む)の計算結果 / `, `一般形`];
+  const normalFormText = [`一般形(七対国士を含まない)の計算結果 / `, `標準形`];
+  const formText = testCase.showAllResults ? standardFormText : normalFormText;
+  return buildElement(document, {
+    _tag: 'div',
+    id: 'm2',
+    _children: [
+      { _tag: 'hr' },
+      formText[0],
+      {
+        _tag: 'a',
+        href: '?', // inaccurate
+        _innerHTML: formText[1],
+      },
+      { _tag: 'br' },
+      buildTeipaikeiTable(document, testCase),
+      { _tag: 'br' },
+      { _tag: 'hr' },
+      { _tag: 'br' },
+      { _tag: 'textarea', _innerHTML: getTextAreaContent(testCase) },
+      { _tag: 'br' },
+    ],
+  });
+};
+
 /**
  * Build document of website
  * @param testCase the test case
@@ -224,7 +269,7 @@ const buildDocument = (testCase: TestCase) => {
   // create container
   const container = buildElement(document, {
     _tag: 'div',
-    _children: [buildForm(document, testCase.input), buildHand(document, testCase)],
+    _children: [buildForm(document, testCase.input), buildHand(document, testCase), buildM2Div(document, testCase)],
   });
   // mount and return
   document.body.appendChild(container);
@@ -237,5 +282,6 @@ describe('Test ui functions', () => {
     console.log(window.document.body.innerHTML);
     vi.stubGlobal('document', window.document);
     run();
+    console.log(window.document.body.innerHTML);
   });
 });
