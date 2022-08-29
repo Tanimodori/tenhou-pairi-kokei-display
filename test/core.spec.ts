@@ -11,6 +11,8 @@ import {
   mjagari,
   mjnokori,
   mjmachi,
+  mjtenpaikei,
+  Tenpaikei,
 } from 'src/legacy';
 
 describe('mjtiles', () => {
@@ -229,5 +231,65 @@ describe('mjmachi', () => {
   it.each(cases)('can calulate waiting tiles', (hand, standard, normal) => {
     expect(testHand(hand)).toEqual(mjtiles(standard));
     expect(testHand(hand, false)).toEqual(mjtiles(normal));
+  });
+});
+
+describe('mjtenpaikei', () => {
+  const testHand = (tiles: string, show_all_result = true) => {
+    resetMjagari(show_all_result);
+    const hand = mjtiles(tiles) as MJArray;
+    hand.mjfail = false;
+    return mjtenpaikei(hand);
+  };
+
+  const cases: [string, Tenpaikei][] = [
+    // no-ten
+    ['123456789m258p11z', { nokori_max: 0 }],
+    // normal
+    [
+      '123456789m235p11z',
+      {
+        nokori_max: 8,
+        '5p': { nokori: 8, '1p': 4, '4p': 4 },
+        '2p': { nokori: 4, '4p': 4 },
+      },
+    ],
+    // 7 pairs
+    [
+      '1122m3344556678p',
+      {
+        nokori_max: 4,
+        '3p': { nokori: 4, '1m': 2, '2m': 2 },
+        '6p': { nokori: 4, '1m': 2, '2m': 2 },
+        '7p': { nokori: 3, '8p': 3 },
+        '8p': { nokori: 3, '7p': 3 },
+      },
+    ],
+    // 13 orphans
+    [
+      '19m19p159s1234567z',
+      {
+        nokori_max: 39,
+        '5s': {
+          nokori: 39,
+          '1m': 3,
+          '9m': 3,
+          '1s': 3,
+          '9s': 3,
+          '1p': 3,
+          '9p': 3,
+          '1z': 3,
+          '2z': 3,
+          '3z': 3,
+          '4z': 3,
+          '5z': 3,
+          '6z': 3,
+          '7z': 3,
+        },
+      },
+    ],
+  ];
+  it.each(cases)('can calulate all waiting forms', (hand, standard) => {
+    expect(testHand(hand)).toEqual(standard);
   });
 });
