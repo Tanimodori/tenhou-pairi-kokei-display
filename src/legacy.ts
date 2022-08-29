@@ -487,7 +487,7 @@ export const run = () => {
     const tenpaikeis_local = tenpaikeis[sutehais[i]];
     tr.removeChild(tds[3]);
     tr.removeChild(tds[3]);
-    const td_anchor = tds[3];
+    const td_anchor = tds[2];
     const nokori_all = tenpaikeis_local.koukei + tenpaikeis_local.gukei;
     // modify
     // koukei
