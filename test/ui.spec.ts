@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Window, Document, HTMLElement } from 'happy-dom';
-import { run } from 'src/legacy';
+import { mjtiles, run } from 'src/legacy';
 
 /** Test case for ui manipulation */
 interface TestCaseInput {
@@ -139,6 +139,39 @@ const buildForm = (document: Document, input: string) => {
   });
 };
 
+/** Get the tenpai text */
+const getTenpaiText = (shanten: { standard: number; normal: number }) => {
+  const rawText = (x: number) => (x ? `${x}向聴` : `聴牌`);
+  const { standard, normal } = shanten;
+  if (standard !== normal) {
+    return `標準形${rawText(standard)} / 一般形${rawText(normal)}`;
+  } else {
+    return `${rawText(standard)} `;
+  }
+};
+
+/**
+ * Build the hand of website
+ * @param document the window document object
+ * @param testCase the test case
+ */
+const buildHand = (document: Document, testCase: TestCase) => {
+  const tiles = mjtiles(testCase.tiles).map((tile) =>
+    buildElement(document, {
+      _tag: 'a',
+      href: '?', // inaccurate
+      _class: 'D',
+      _children: [{ _tag: 'img', src: `https://cdn.tenhou.net/2/t/${tile}.gif` }],
+    }),
+  );
+  // result
+  return buildElement(document, {
+    _tag: 'div',
+    id: 'tehai',
+    _children: [getTenpaiText(testCase.calculated.shanten), { _tag: 'br' }, ...tiles],
+  });
+};
+
 const buildDocument = (testCase: TestCase) => {
   // create document
   const window = new Window();
@@ -146,7 +179,7 @@ const buildDocument = (testCase: TestCase) => {
   // create container
   const container = buildElement(document, {
     _tag: 'div',
-    _children: [buildForm(document, testCase.input)],
+    _children: [buildForm(document, testCase.input), buildHand(document, testCase)],
   });
   // mount and return
   document.body.appendChild(container);
