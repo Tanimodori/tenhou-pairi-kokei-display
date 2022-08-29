@@ -3,7 +3,7 @@ import { Window, Document, HTMLElement } from 'happy-dom';
 import { run } from 'src/legacy';
 
 /** Test case for ui manipulation */
-interface TestCase {
+interface TestCaseInput {
   /** The string representation of user input. */
   input: string;
   /**
@@ -53,6 +53,36 @@ interface TestCase {
     result: Array<[string, string, number, string, number]>;
   };
 }
+
+type TestCase = Required<TestCaseInput>;
+
+/** Sanitize test cases for testing */
+const buildTestCases = (inputs: TestCaseInput[]): TestCase[] => {
+  return inputs.map((input) => ({
+    tiles: input.input,
+    showAllResults: true,
+    ...input,
+  }));
+};
+
+const testCases: TestCase[] = buildTestCases([
+  {
+    input: '19m19s19p123456z5m2p',
+    calculated: {
+      shanten: { standard: 1, normal: 7 },
+      result: [
+        ['5m', '19m19s19p123456z', 40],
+        ['2p', '19m19s19p123456z', 40],
+      ],
+    },
+    expected: {
+      result: [
+        ['5m', '19m19s19p123456z', 40, '', 0],
+        ['2p', '19m19s19p123456z', 40, '', 0],
+      ],
+    },
+  },
+]);
 
 /**
  * Construct element for testing
@@ -122,25 +152,6 @@ const buildDocument = (testCase: TestCase) => {
   document.body.appendChild(container);
   return window;
 };
-
-const testCases: TestCase[] = [
-  {
-    input: '19m19s19p123456z5m2p',
-    calculated: {
-      shanten: { standard: 1, normal: 7 },
-      result: [
-        ['5m', '19m19s19p123456z', 40],
-        ['2p', '19m19s19p123456z', 40],
-      ],
-    },
-    expected: {
-      result: [
-        ['5m', '19m19s19p123456z', 40, '', 0],
-        ['2p', '19m19s19p123456z', 40, '', 0],
-      ],
-    },
-  },
-];
 
 describe('Test ui functions', () => {
   it.each(testCases)('can render table', (testCase) => {
