@@ -213,7 +213,6 @@ const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
   });
 };
 
-buildM2Div;
 /**
  * Get the textarea content
  * @param testCase the test case
