@@ -172,6 +172,51 @@ const buildHand = (document: Document, testCase: TestCase) => {
   });
 };
 
+/**
+ * Build the teipaikei table of website
+ * @param document the window document object
+ * @param testCase the test case
+ */
+const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
+  /**
+   * transform tile to tenhou tile ID
+   * [1..9m][1..9p][1..9s][1..7z] -> [0..33]
+   */
+  const tile2Id = (tile: string) => 'mpsz'.indexOf(tile[1]) * 9 + (tile[0] === '0' ? 4 : Number(tile[0])) - 1;
+  const trs = testCase.calculated.result.map(([discard, tiles, count]) => {
+    const tds = mjtiles(tiles).map((tile) =>
+      buildElement(document, {
+        _tag: 'a',
+        href: '?', // inaccurate
+        _class: 'D',
+        _children: [{ _tag: 'img', src: `https://cdn.tenhou.net/2/a/${tile}.gif` }],
+      }),
+    );
+    return buildElement(document, {
+      _tag: 'tr',
+      id: `mda${tile2Id(discard)}`,
+      _children: [
+        { _tag: 'td', _innerHTML: `打` },
+        {
+          _tag: 'td',
+          _children: [{ _tag: 'img', src: `https://cdn.tenhou.net/2/a/${discard}.gif` }],
+        },
+        { _tag: 'td', _innerHTML: `摸[` },
+        { _tag: 'td', _children: tds },
+        { _tag: 'td', _innerHTML: `${count}枚	]` },
+      ],
+    });
+  });
+  return buildElement(document, {
+    _tag: 'table',
+    _children: [{ _tag: 'tbody', _children: trs }],
+  });
+};
+
+/**
+ * Build document of website
+ * @param testCase the test case
+ */
 const buildDocument = (testCase: TestCase) => {
   // create document
   const window = new Window();
