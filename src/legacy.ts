@@ -8,6 +8,8 @@ export const S_Q_QUERY = '標準形(七対国士を含む)の計算結果 / 一�
 export const S_YIISHANTEN = '1向聴';
 /** String in the webpage to check if it is ii-shan-ten of standard forms */
 export const S_YIISHANTEN_ALL = '標準形1向聴';
+/** String in the webpage to check if it is a 14-tile input */
+export const S_14TILES = '(14枚)';
 /** Regexp of all valid tiles */
 export const MJ_RE = /([0-9]+[mpsz])+/gm;
 
@@ -400,6 +402,10 @@ export const run = () => {
     if (!global_show_all_result || !tehai.textContent.startsWith(S_YIISHANTEN_ALL)) {
       return;
     }
+  }
+  // temp disable input other than 14 tiles
+  if (!tehai.textContent.endsWith(S_14TILES)) {
+    return;
   }
 
   // parse hands
