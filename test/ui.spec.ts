@@ -203,7 +203,8 @@ const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
         },
         { _tag: 'td', _innerHTML: `摸[` },
         { _tag: 'td', _children: tds },
-        { _tag: 'td', _innerHTML: `${count}枚	]` },
+        { _tag: 'td', _innerHTML: `${count}枚` },
+        { _tag: 'td', _innerHTML: `]` },
       ],
     });
   });
