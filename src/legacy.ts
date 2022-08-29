@@ -1,4 +1,4 @@
-import { inject_css } from './ui';
+import { getTiles, inject_css } from './ui';
 
 /** String in the webpage to check if calculating normal forms */
 export const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
@@ -405,6 +405,7 @@ export const run = () => {
   // parse hands
   const info = m2.getElementsByTagName('textarea')[0].textContent;
   const matches = info.match(MJ_RE).map(mjtiles);
+  matches[0] = getTiles();
 
   // calculate tenpaikei
   const hands = matches[0].sort(mjcomp);

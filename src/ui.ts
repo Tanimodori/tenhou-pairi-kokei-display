@@ -42,3 +42,19 @@ export const inject_css = () => {
   styleSheet.innerText = styles;
   document.head.appendChild(styleSheet);
 };
+
+/**
+ * Get tiles from hand tile image
+ * to get the tile auto-filled by Tenhou-pairi
+ */
+export const getTiles = () => {
+  const pattern = /([0-9][mps]|[1-7]z).gif/;
+  const tiles: string[] = [];
+  document.querySelectorAll<HTMLImageElement>('div#tehai>a>img').forEach((element) => {
+    const match = element.src.match(pattern);
+    if (match) {
+      tiles.push(match[1]);
+    }
+  });
+  return tiles;
+};
