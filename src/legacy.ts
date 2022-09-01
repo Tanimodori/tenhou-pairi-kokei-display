@@ -8,8 +8,6 @@ export const S_Q_QUERY = '標準形(七対国士を含む)の計算結果 / 一�
 export const S_YIISHANTEN = '1向聴';
 /** String in the webpage to check if it is ii-shan-ten of standard forms */
 export const S_YIISHANTEN_ALL = '標準形1向聴';
-/** String in the webpage to check if it is a 14-tile input */
-export const S_14TILES = '(14枚)';
 /** Regexp of all valid tiles */
 export const MJ_RE = /([0-9]+[mpsz])+/gm;
 
@@ -403,15 +401,17 @@ export const run = () => {
       return;
     }
   }
-  // temp disable input other than 14 tiles
-  if (!tehai.textContent.endsWith(S_14TILES)) {
-    return;
-  }
 
   // parse hands
   const info = m2.getElementsByTagName('textarea')[0].textContent;
   const matches = info.match(MJ_RE).map(mjtiles);
   matches[0] = getTiles();
+
+  // allowing input like (3n+2) after tenhou-pairi auto fill
+  // TODO: add test
+  if (matches[0].length % 3 !== 2) {
+    return;
+  }
 
   // calculate tenpaikei
   const hands = matches[0].sort(mjcomp);
