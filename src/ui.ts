@@ -44,6 +44,20 @@ export interface UIInfo extends WaitingInfo {
 }
 
 export const getShantenInfo = (): UIInfoShanten => {
+  const shantenToNumber = (text: string) => {
+    text = text.trim();
+    if (text.indexOf('聴牌') !== -1) {
+      return 0;
+    } else if (text.indexOf('和了') !== -1) {
+      return -1;
+    } else {
+      const index = text.indexOf('向聴');
+      if (index !== -1) {
+        return Number.parseInt(text.substring(0, index));
+      }
+    }
+    throw new Error(`"${text}" is not a valid shanten text`);
+  };
   // should use `div#tehai`
   // workarounds for https://github.com/capricorn86/happy-dom/issues/576
   const tehaiElement = document.querySelector<HTMLDivElement>('#tehai');
@@ -54,17 +68,20 @@ export const getShantenInfo = (): UIInfoShanten => {
   tehaiElement.childNodes.forEach((node) => {
     if (!result && node.nodeType === node.TEXT_NODE) {
       const text = node.textContent ?? '';
-      const pattern = /\d+(?=向聴)/gm;
+      if (text.indexOf('聴牌') !== -1) {
+        result = { standard: shanten, normal: shanten };
+      }
+      const pattern = /(\d向聴|聴牌|和了)/gm;
       const matches = text.match(pattern);
       if (matches) {
         if (matches.length === 1) {
           // one
-          const shanten = Number.parseInt(matches[0]);
+          const shanten = shantenToNumber(matches[0]);
           result = { standard: shanten, normal: shanten };
         } else if (matches.length === 2) {
           // two
-          const standard = Number.parseInt(matches[0]);
-          const normal = Number.parseInt(matches[1]);
+          const standard = shantenToNumber(matches[0]);
+          const normal = shantenToNumber(matches[1]);
           result = { standard, normal };
         }
       }
