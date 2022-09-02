@@ -1,4 +1,4 @@
-import { getTextareaTiles, getTiles, inject_css } from './ui';
+import { getTextareaTiles, getTiles, inject_css, WaitingInfo } from './ui';
 
 /** String in the webpage to check if calculating normal forms */
 export const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
@@ -396,6 +396,36 @@ export const mouse_out_node = (node: HTMLElement) => {
   popup.classList.toggle('show');
 };
 
+export const getTenpaikeis = (info: WaitingInfo) => {
+  const hands = info.hand;
+  const tenpaikeis: Record<string, Iishanten> = {};
+  for (const waiting of info.waitings) {
+    const sutehai = waiting.discard; // TODO: check null
+    const tsumohais = waiting.tiles;
+    const tenpaikeis_local = {} as Iishanten;
+    tenpaikeis_local.koukei = 0;
+    tenpaikeis_local.gukei = 0;
+    tenpaikeis_local.koukeihais = [];
+    tenpaikeis_local.gukeihais = [];
+    for (const tsumohai of tsumohais) {
+      const hands_local = [...mjsub([...hands], sutehai), tsumohai];
+      const tenpaikei_local = mjtenpaikei(hands_local) as TenpaikeiExtended;
+      tenpaikei_local.link = '?' + (global_show_all_result ? 'q' : 'p') + '=' + hands_local.join('');
+      tenpaikei_local.nokori_self = mjnokori(hands, tsumohai);
+      if (tenpaikei_local.nokori_max > 4) {
+        tenpaikeis_local.koukei += tenpaikei_local.nokori_self;
+        tenpaikeis_local.koukeihais.push(tsumohai);
+      } else {
+        tenpaikeis_local.gukei += tenpaikei_local.nokori_self;
+        tenpaikeis_local.gukeihais.push(tsumohai);
+      }
+      tenpaikeis_local[tsumohai] = tenpaikei_local;
+    }
+    tenpaikeis[sutehai] = tenpaikeis_local;
+  }
+  return tenpaikeis;
+};
+
 /**
  * The main function of script
  */
@@ -420,43 +450,17 @@ export const run = () => {
   }
 
   // parse hands
-  const matches = getTextareaTiles();
-  matches[0] = getTiles();
+  const waitingInfo = getTextareaTiles();
+  waitingInfo.hand = getTiles().sort(mjcomp);
 
   // allowing input like (3n+2) after tenhou-pairi auto fill
   // TODO: add test
-  if (matches[0].length % 3 !== 2) {
+  if (waitingInfo.hand.length % 3 !== 2) {
     return;
   }
 
   // calculate tenpaikei
-  const hands = matches[0].sort(mjcomp);
-
-  const tenpaikeis: Record<string, Iishanten> = {};
-  for (let i = 1; i < matches.length; i += 2) {
-    const sutehai = matches[i][0];
-    const tsumohais = matches[i + 1];
-    const tenpaikeis_local = {} as Iishanten;
-    tenpaikeis_local.koukei = 0;
-    tenpaikeis_local.gukei = 0;
-    tenpaikeis_local.koukeihais = [];
-    tenpaikeis_local.gukeihais = [];
-    for (const tsumohai of tsumohais) {
-      const hands_local = [...mjsub([...hands], sutehai), tsumohai];
-      const tenpaikei_local = mjtenpaikei(hands_local) as TenpaikeiExtended;
-      tenpaikei_local.link = '?' + (global_show_all_result ? 'q' : 'p') + '=' + hands_local.join('');
-      tenpaikei_local.nokori_self = mjnokori(hands, tsumohai);
-      if (tenpaikei_local.nokori_max > 4) {
-        tenpaikeis_local.koukei += tenpaikei_local.nokori_self;
-        tenpaikeis_local.koukeihais.push(tsumohai);
-      } else {
-        tenpaikeis_local.gukei += tenpaikei_local.nokori_self;
-        tenpaikeis_local.gukeihais.push(tsumohai);
-      }
-      tenpaikeis_local[tsumohai] = tenpaikei_local;
-    }
-    tenpaikeis[sutehai] = tenpaikeis_local;
-  }
+  const tenpaikeis = getTenpaikeis(waitingInfo);
 
   // display tenpaikei
   inject_css();
