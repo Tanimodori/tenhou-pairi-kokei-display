@@ -336,20 +336,22 @@ export const run = () => {
   // legacy
   const queryType = uiInfo.query.type;
   global_show_all_result = queryType === 'standard';
+
+  // prechecks
   if (uiInfo.shanten[queryType] !== 1) {
     return;
   }
-
   // allowing input like (3n+2) after tenhou-pairi auto fill
   // TODO: add test
   if (uiInfo.hand.length % 3 !== 2) {
     return;
   }
 
+  // inject css
+  inject_css();
+
   // calculate tenpaikei
   const tenpaikeis = getTenpaikeis(uiInfo);
-
   // display tenpaikei
-  inject_css();
   renderTable(tenpaikeis);
 };
