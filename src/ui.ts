@@ -33,8 +33,6 @@ export interface UIInfoShanten {
 export interface UIInfo extends WaitingInfo {
   /** query type */
   query: {
-    /** raw string flags like `q` and `p` */
-    raw: string;
     /** `q` flag for `standard`, `p` flag for normal */
     type: 'standard' | 'normal';
     /** if `d` flag presents */
@@ -43,7 +41,7 @@ export interface UIInfo extends WaitingInfo {
   shanten: UIInfoShanten;
 }
 
-export const getShantenInfo = () => {
+export const getShantenInfo = (): UIInfoShanten => {
   // should use `div#tehai`
   // workarounds for https://github.com/capricorn86/happy-dom/issues/576
   const tehaiElement = document.querySelector<HTMLDivElement>('#tehai');
@@ -137,4 +135,14 @@ export const getTextareaTiles = () => {
 /**
  * Get all ui info
  */
-export const getUIInfo = () => {};
+export const getUIInfo = () => {
+  const shanten = getShantenInfo();
+  const hand = getTiles();
+  const waitingInfo = getTextareaTiles();
+  const result: UIInfo = {
+    shanten,
+    ...waitingInfo,
+    hand,
+  };
+  return result;
+};
