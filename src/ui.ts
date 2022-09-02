@@ -74,9 +74,6 @@ export const getShantenInfo = (): UIInfoShanten => {
   tehaiElement.childNodes.forEach((node) => {
     if (!result && node.nodeType === node.TEXT_NODE) {
       const text = node.textContent ?? '';
-      if (text.indexOf('聴牌') !== -1) {
-        result = { standard: shanten, normal: shanten };
-      }
       const pattern = /(\d向聴|聴牌|和了)/gm;
       const matches = text.match(pattern);
       if (matches) {
