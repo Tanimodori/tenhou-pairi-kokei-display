@@ -431,7 +431,14 @@ export const getTenpaikeis = (info: WaitingInfo) => {
  */
 export const run = () => {
   // check
-  const uiInfo: UIInfo = getUIInfo();
+  let uiInfo: UIInfo;
+  try {
+    uiInfo = getUIInfo();
+  } catch (e: unknown) {
+    if (import.meta.env.DEV) {
+      throw e;
+    }
+  }
 
   // legacy
   const queryType = uiInfo.query.type;
