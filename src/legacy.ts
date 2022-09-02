@@ -252,13 +252,32 @@ export interface Tenpaikei {
   };
 }
 
+/** one waiting form of a hand of ii-shan-ten */
+export interface TenpaikeiExtended extends Tenpaikei {
+  link: string;
+  nokori_self: number;
+  koukei: number;
+  gukei: number;
+  koukeihais: unknown[];
+  gukeihais: unknown[];
+}
+
+/** ii-shan-ten */
+export interface Iishanten {
+  koukei: number;
+  gukei: number;
+  koukeihais: unknown[];
+  gukeihais: unknown[];
+  [tile: string]: TenpaikeiExtended;
+}
+
 /**
  * Find waiting forms of the given hand
  * @param mjarr the hand
  * @returns the waiting forms
  */
 export const mjtenpaikei = (mjarr: MJArray) => {
-  if (mjarr.length % 3 === 1) return {};
+  if (mjarr.length % 3 === 1) return {} as Tenpaikei;
   const result = {} as Tenpaikei;
   result.nokori_max = 0;
   const unique = (value, index, self) => self.indexOf(value) === index;
@@ -412,18 +431,19 @@ export const run = () => {
 
   // calculate tenpaikei
   const hands = matches[0].sort(mjcomp);
-  const tenpaikeis = {};
+
+  const tenpaikeis: Record<string, Iishanten> = {};
   for (let i = 1; i < matches.length; i += 2) {
     const sutehai = matches[i][0];
     const tsumohais = matches[i + 1];
-    const tenpaikeis_local = {};
+    const tenpaikeis_local = {} as Iishanten;
     tenpaikeis_local.koukei = 0;
     tenpaikeis_local.gukei = 0;
     tenpaikeis_local.koukeihais = [];
     tenpaikeis_local.gukeihais = [];
     for (const tsumohai of tsumohais) {
       const hands_local = [...mjsub([...hands], sutehai), tsumohai];
-      const tenpaikei_local = mjtenpaikei(hands_local);
+      const tenpaikei_local = mjtenpaikei(hands_local) as TenpaikeiExtended;
       tenpaikei_local.link = '?' + (global_show_all_result ? 'q' : 'p') + '=' + hands_local.join('');
       tenpaikei_local.nokori_self = mjnokori(hands, tsumohai);
       if (tenpaikei_local.nokori_max > 4) {
