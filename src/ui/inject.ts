@@ -1,4 +1,4 @@
-import { Iishanten, Tenpaikei } from '@/legacy';
+import { Iishanten, mjcomp, mjtiles, MJ_TILES, Tenpaikei } from '@/legacy';
 import style from '@/style/index.css?inline';
 
 /** Inject Css style to the page */
