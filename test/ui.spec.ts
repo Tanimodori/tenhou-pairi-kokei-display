@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Window, Document, HTMLElement } from 'happy-dom';
 import { mjtiles, run } from 'src/legacy';
-import { getTiles } from 'src/ui';
+import { getTextareaTiles, getTiles } from 'src/ui';
 
 /** Test case for ui manipulation */
 interface TestCaseInput {
@@ -219,7 +219,7 @@ const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
  * Get the textarea content
  * @param testCase the test case
  */
-const getTextAreaContent = (testCase: TestCase) => {
+const buildTextareaContent = (testCase: TestCase) => {
   // It uses `testCase.input`, not `testCase.tiles`
   const firstLine = `${testCase.input}\n`;
   const mainLines = testCase.calculated.result.map(
@@ -253,7 +253,7 @@ const buildM2Div = (document: Document, testCase: TestCase) => {
       { _tag: 'br' },
       { _tag: 'hr' },
       { _tag: 'br' },
-      { _tag: 'textarea', _innerHTML: getTextAreaContent(testCase) },
+      { _tag: 'textarea', _innerHTML: buildTextareaContent(testCase) },
       { _tag: 'br' },
     ],
   });
@@ -282,6 +282,13 @@ describe('Test ui functions', () => {
     const window = buildDocument(testCase);
     vi.stubGlobal('document', window.document);
     expect(getTiles()).toEqual(mjtiles(testCase.tiles));
+  });
+
+  it.each(testCases)('getTextareaTiles', (testCase) => {
+    const window = buildDocument(testCase);
+    vi.stubGlobal('document', window.document);
+    const expected = testCase.calculated.result.flatMap(([discard, tiles]) => [[discard], mjtiles(tiles)]);
+    expect(getTextareaTiles()).toEqual([mjtiles(testCase.tiles), ...expected]);
   });
 
   it.each(testCases)('can render table', (testCase) => {
