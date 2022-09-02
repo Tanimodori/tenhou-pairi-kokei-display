@@ -1,3 +1,5 @@
+import { mjtiles } from './legacy';
+
 /** Inject Css style to the page */
 export const inject_css = () => {
   const styles = `
@@ -57,4 +59,23 @@ export const getTiles = () => {
     }
   });
   return tiles;
+};
+
+/**
+ * Get tiles from textarea
+ */
+export const getTextareaTiles = () => {
+  /** Regexp of all valid tiles */
+  const pattern = /([0-9]+[mps]|[1-7]+z)+/gm;
+  const textarea = document.querySelector<HTMLTextAreaElement>('div#m2 > textarea');
+  if (!textarea) {
+    throw new Error('Cannot get textarea element');
+  }
+  const content = textarea.textContent ?? '';
+  const matches = content.match(pattern);
+  if (matches) {
+    return matches.map(mjtiles);
+  } else {
+    return [];
+  }
 };

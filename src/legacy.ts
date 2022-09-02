@@ -1,4 +1,4 @@
-import { getTiles, inject_css } from './ui';
+import { getTextareaTiles, getTiles, inject_css } from './ui';
 
 /** String in the webpage to check if calculating normal forms */
 export const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
@@ -8,8 +8,6 @@ export const S_Q_QUERY = '標準形(七対国士を含む)の計算結果 / 一�
 export const S_YIISHANTEN = '1向聴';
 /** String in the webpage to check if it is ii-shan-ten of standard forms */
 export const S_YIISHANTEN_ALL = '標準形1向聴';
-/** Regexp of all valid tiles */
-export const MJ_RE = /([0-9]+[mpsz])+/gm;
 
 /**
  * Split a hand into tiles array
@@ -403,8 +401,7 @@ export const run = () => {
   }
 
   // parse hands
-  const info = m2.getElementsByTagName('textarea')[0].textContent;
-  const matches = info.match(MJ_RE).map(mjtiles);
+  const matches = getTextareaTiles();
   matches[0] = getTiles();
 
   // allowing input like (3n+2) after tenhou-pairi auto fill
