@@ -438,6 +438,7 @@ export const run = () => {
     if (import.meta.env.DEV) {
       throw e;
     }
+    return;
   }
 
   // legacy
