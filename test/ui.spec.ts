@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Window, Document, HTMLElement } from 'happy-dom';
-import { mjtiles, run } from 'src/legacy';
-import { getShantenInfo, getTextareaTiles, getTiles, shantenToNumber } from 'src/ui';
+import { mjtiles, run } from '@/legacy';
+import { getShantenInfo, getTextareaTiles, getTiles, shantenToNumber } from '@/ui';
 
 /** Test case for ui manipulation */
 interface TestCaseInput {

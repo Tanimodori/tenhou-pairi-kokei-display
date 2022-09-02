@@ -15,5 +15,8 @@ export default defineConfig({
     },
     minify: false,
   },
+  resolve: {
+    alias: { '@': resolve(__dirname, 'src') },
+  },
   plugins: [gfMetadata],
 });

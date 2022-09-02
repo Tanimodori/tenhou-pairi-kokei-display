@@ -1,3 +1,3 @@
-import { run } from './legacy';
+import { run } from '@/legacy';
 
 run();

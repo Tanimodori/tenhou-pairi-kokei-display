@@ -1,4 +1,4 @@
-import { getUIInfo, inject_css, UIInfo, WaitingInfo } from './ui';
+import { getUIInfo, inject_css, UIInfo, WaitingInfo } from '@/ui';
 
 /** String in the webpage to check if calculating normal forms */
 export const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
