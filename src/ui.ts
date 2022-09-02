@@ -50,7 +50,7 @@ export const inject_css = () => {
 export const getTiles = () => {
   const pattern = /([0-9][mps]|[1-7]z).gif/;
   const tiles: string[] = [];
-  document.querySelectorAll<HTMLImageElement>('div#tehai>a>img').forEach((element) => {
+  document.querySelectorAll<HTMLImageElement>('div#tehai > a > img').forEach((element) => {
     const match = element.src.match(pattern);
     if (match) {
       tiles.push(match[1]);
