@@ -1,5 +1,5 @@
 import { Iishanten, mjcomp, mjtiles, MJ_TILES, Tenpaikei } from '@/legacy';
-import style from '@/style/index.css?inline';
+import style from '@/style/index.less?inline';
 
 /** Inject Css style to the page */
 export const inject_css = () => {
