@@ -287,8 +287,13 @@ describe('Test ui functions', () => {
   it.each(testCases)('getTextareaTiles', (testCase) => {
     const window = buildDocument(testCase);
     vi.stubGlobal('document', window.document);
-    const expected = testCase.calculated.result.flatMap(([discard, tiles]) => [[discard], mjtiles(tiles)]);
-    expect(getTextareaTiles()).toEqual([mjtiles(testCase.tiles), ...expected]);
+    expect(getTextareaTiles()).toEqual({
+      hand: mjtiles(testCase.tiles),
+      waitings: testCase.calculated.result.map(([discard, tiles]) => ({
+        discard,
+        tiles: mjtiles(tiles),
+      })),
+    });
   });
 
   it.each(testCases)('can render table', (testCase) => {
