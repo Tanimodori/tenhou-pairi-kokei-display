@@ -266,8 +266,8 @@ export interface TenpaikeiExtended extends Tenpaikei {
 export interface Iishanten {
   koukei: number;
   gukei: number;
-  koukeihais: unknown[];
-  gukeihais: unknown[];
+  koukeihais: string[];
+  gukeihais: string[];
   [tile: string]: TenpaikeiExtended;
 }
 
@@ -328,7 +328,7 @@ export const create_node_tile = (tile: string, link: string) => {
  * @param children children of table data element
  * @returns the created table data element
  */
-export const create_node_td = (...children: HTMLElement[]) => {
+export const create_node_td = (...children: Node[]) => {
   const td = document.createElement('td');
   for (const child of children) {
     td.appendChild(child);
