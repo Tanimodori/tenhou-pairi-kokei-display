@@ -1,4 +1,4 @@
-import { mjtiles } from './legacy';
+import { mjcomp, mjtiles } from './legacy';
 import style from './style.css?inline';
 
 /** Inject Css style to the page */
@@ -153,7 +153,7 @@ export const getTextareaTiles = () => {
  */
 export const getUIInfo = () => {
   const shanten = getShantenInfo();
-  const hand = getTiles();
+  const hand = getTiles().sort(mjcomp);
   const waitingInfo = getTextareaTiles();
   const result: UIInfo = {
     shanten,

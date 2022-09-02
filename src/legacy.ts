@@ -1,4 +1,4 @@
-import { getTextareaTiles, getTiles, inject_css, WaitingInfo } from './ui';
+import { getUIInfo, inject_css, UIInfo, WaitingInfo } from './ui';
 
 /** String in the webpage to check if calculating normal forms */
 export const S_P_QUERY = '一般形(七対国士を含まない)の計算結果 / 標準形';
@@ -431,40 +431,27 @@ export const getTenpaikeis = (info: WaitingInfo) => {
  */
 export const run = () => {
   // check
-  const tehai = document.getElementById('tehai');
-  const m2 = document.getElementById('m2');
-  if (!tehai) return;
-  if (!m2) return;
+  const uiInfo: UIInfo = getUIInfo();
 
-  if (m2.textContent.startsWith(S_P_QUERY)) {
-    global_show_all_result = false;
-  } else if (m2.textContent.startsWith(S_Q_QUERY)) {
-    global_show_all_result = true;
-  } else {
+  // legacy
+  const queryType = uiInfo.query.type;
+  global_show_all_result = queryType === 'standard';
+  if (uiInfo.shanten[queryType] !== 1) {
     return;
   }
-  if (!tehai.textContent.startsWith(S_YIISHANTEN)) {
-    if (!global_show_all_result || !tehai.textContent.startsWith(S_YIISHANTEN_ALL)) {
-      return;
-    }
-  }
-
-  // parse hands
-  const waitingInfo = getTextareaTiles();
-  waitingInfo.hand = getTiles().sort(mjcomp);
 
   // allowing input like (3n+2) after tenhou-pairi auto fill
   // TODO: add test
-  if (waitingInfo.hand.length % 3 !== 2) {
+  if (uiInfo.hand.length % 3 !== 2) {
     return;
   }
 
   // calculate tenpaikei
-  const tenpaikeis = getTenpaikeis(waitingInfo);
+  const tenpaikeis = getTenpaikeis(uiInfo);
 
   // display tenpaikei
   inject_css();
-  const trs = m2.getElementsByTagName('tr');
+  const trs = document.querySelectorAll('#m2 tr');
   const sutehais = Object.keys(tenpaikeis);
   for (let i = 0; i < sutehais.length; ++i) {
     const tr = trs[i];
