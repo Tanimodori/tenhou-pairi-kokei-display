@@ -43,21 +43,27 @@ export interface UIInfo extends WaitingInfo {
   shanten: UIInfoShanten;
 }
 
-export const getShantenInfo = (): UIInfoShanten => {
-  const shantenToNumber = (text: string) => {
-    text = text.trim();
-    if (text.indexOf('聴牌') !== -1) {
-      return 0;
-    } else if (text.indexOf('和了') !== -1) {
-      return -1;
-    } else {
-      const index = text.indexOf('向聴');
-      if (index !== -1) {
-        return Number.parseInt(text.substring(0, index));
-      }
+/**
+ * Transform `"x向聴"` to number `x`
+ * `"聴牌"` -> 0, `"和了"` -> -1,
+ */
+export const shantenToNumber = (text: string) => {
+  text = text.trim();
+  if (text.indexOf('聴牌') !== -1) {
+    return 0;
+  } else if (text.indexOf('和了') !== -1) {
+    return -1;
+  } else {
+    const index = text.indexOf('向聴');
+    if (index !== -1) {
+      return Number.parseInt(text.substring(0, index));
     }
-    throw new Error(`"${text}" is not a valid shanten text`);
-  };
+  }
+  throw new Error(`"${text}" is not a valid shanten text`);
+};
+
+/** Get shanten info from document */
+export const getShantenInfo = (): UIInfoShanten => {
   // should use `div#tehai`
   // workarounds for https://github.com/capricorn86/happy-dom/issues/576
   const tehaiElement = document.querySelector<HTMLDivElement>('#tehai');
