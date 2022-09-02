@@ -9,6 +9,73 @@ export const inject_css = () => {
   document.head.appendChild(styleSheet);
 };
 
+export interface WaitingInfo {
+  /** Current hand */
+  hand: string[];
+  /** Waiting tiles after discards */
+  waitings: {
+    /** the discarded tile */
+    discard?: string;
+    /** Waiting tiles after discards */
+    tiles: string[];
+  }[];
+}
+
+/** shanten number */
+export interface UIInfoShanten {
+  /** shanten number of standard forms */
+  standard: number;
+  /** shanten number of normal forms */
+  normal: number;
+}
+
+/** All UI info */
+export interface UIInfo extends WaitingInfo {
+  /** query type */
+  query: {
+    /** raw string flags like `q` and `p` */
+    raw: string;
+    /** `q` flag for `standard`, `p` flag for normal */
+    type: 'standard' | 'normal';
+    /** if `d` flag presents */
+    autofill: boolean;
+  };
+  shanten: UIInfoShanten;
+}
+
+export const getShantenInfo = () => {
+  // should use `div#tehai`
+  // workarounds for https://github.com/capricorn86/happy-dom/issues/576
+  const tehaiElement = document.querySelector<HTMLDivElement>('#tehai');
+  if (!tehaiElement) {
+    throw new Error('Cannot find #tehai element');
+  }
+  let result: UIInfoShanten | null = null;
+  tehaiElement.childNodes.forEach((node) => {
+    if (!result && node.nodeType === node.TEXT_NODE) {
+      const text = node.textContent ?? '';
+      const pattern = /\d+(?=向聴)/gm;
+      const matches = text.match(pattern);
+      if (matches) {
+        if (matches.length === 1) {
+          // one
+          const shanten = Number.parseInt(matches[0]);
+          result = { standard: shanten, normal: shanten };
+        } else if (matches.length === 2) {
+          // two
+          const standard = Number.parseInt(matches[0]);
+          const normal = Number.parseInt(matches[1]);
+          result = { standard, normal };
+        }
+      }
+    }
+  });
+  if (!result) {
+    throw new Error('Cannot find shanten info');
+  }
+  return result;
+};
+
 /**
  * Get tiles from hand tile image
  * to get the tile auto-filled by Tenhou-pairi
@@ -24,18 +91,6 @@ export const getTiles = () => {
   });
   return tiles;
 };
-
-export interface WaitingInfo {
-  /** Current hand */
-  hand: string[];
-  /** Waiting tiles after discards */
-  waitings: {
-    /** the discarded tile */
-    discard?: string;
-    /** Waiting tiles after discards */
-    tiles: string[];
-  }[];
-}
 
 /**
  * Parse info from textarea
@@ -78,3 +133,8 @@ export const getTextareaTiles = () => {
   const content = textarea.textContent ?? '';
   return parseTextareaContent(content);
 };
+
+/**
+ * Get all ui info
+ */
+export const getUIInfo = () => {};

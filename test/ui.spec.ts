@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Window, Document, HTMLElement } from 'happy-dom';
 import { mjtiles, run } from 'src/legacy';
-import { getTextareaTiles, getTiles } from 'src/ui';
+import { getShantenInfo, getTextareaTiles, getTiles } from 'src/ui';
 
 /** Test case for ui manipulation */
 interface TestCaseInput {
@@ -278,6 +278,12 @@ const buildDocument = (testCase: TestCase) => {
 };
 
 describe('Test ui functions', () => {
+  it.each(testCases)('getShantenInfo', (testCase) => {
+    const window = buildDocument(testCase);
+    vi.stubGlobal('document', window.document);
+    expect(getShantenInfo()).toEqual(testCase.calculated.shanten);
+  });
+
   it.each(testCases)('getTiles', (testCase) => {
     const window = buildDocument(testCase);
     vi.stubGlobal('document', window.document);
