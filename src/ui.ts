@@ -29,12 +29,14 @@ export interface UIInfoShanten {
   normal: number;
 }
 
+export type ShantenQueryType = 'standard' | 'normal';
+
 /** All UI info */
 export interface UIInfo extends WaitingInfo {
   /** query type */
   query: {
     /** `q` flag for `standard`, `p` flag for normal */
-    type: 'standard' | 'normal';
+    type: ShantenQueryType;
     /** if `d` flag presents */
     autofill: boolean;
   };
@@ -90,6 +92,20 @@ export const getTiles = () => {
   return tiles;
 };
 
+export const getQueryType = (): ShantenQueryType => {
+  const elementM2A = document.querySelector('#m2 > a');
+  if (!elementM2A) {
+    throw new Error('Cannot get query type');
+  }
+  const content = elementM2A.innerHTML;
+  if (content === '標準形') {
+    return 'normal';
+  } else if (content === '一般形') {
+    return 'standard';
+  }
+  throw new Error('Cannot get query type');
+};
+
 /**
  * Parse info from textarea
  */
@@ -143,6 +159,10 @@ export const getUIInfo = () => {
     shanten,
     ...waitingInfo,
     hand,
+    query: {
+      type: getQueryType(),
+      autofill: hand.length !== waitingInfo.hand.length,
+    },
   };
   return result;
 };
