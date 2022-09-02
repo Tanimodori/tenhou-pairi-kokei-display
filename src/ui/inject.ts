@@ -5,7 +5,7 @@ import style from '@/style/index.less?inline';
 export const inject_css = () => {
   const styleSheet = document.createElement('style');
   styleSheet.setAttribute('type', 'text/css');
-  styleSheet.innerText = style;
+  styleSheet.innerHTML = style;
   document.head.appendChild(styleSheet);
 };
 
