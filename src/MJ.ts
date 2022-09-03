@@ -47,4 +47,25 @@ export default class MJ {
     }
     return input;
   }
+
+  /**
+   * Compare two tiles for sorting
+   * @param a the lhs tile to compare
+   * @param b the rhs tile to compare
+   * @returns the comparison result
+   * @example
+   * ```ts
+   * MJ.compareTile('5s', '6s'); // -> -1
+   * MJ.compareTile('5m', '5p'); // -> -1
+   * MJ.compareTile('5m', '0m'); // -> -1, '0m' is between '56m'
+   * ```
+   */
+  static compareTile([aNum, aSuit]: string, [bNum, bSuit]: string) {
+    const order = '1234506789';
+    if (aSuit !== bSuit) {
+      return aSuit < bSuit ? -1 : 1;
+    } else {
+      return order.indexOf(aNum) - order.indexOf(bNum);
+    }
+  }
 }

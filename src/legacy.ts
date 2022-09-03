@@ -18,6 +18,7 @@ export const mjtiles = MJ.toArray;
  * @param a the lhs tile to compare
  * @param b the rhs tile to compare
  * @returns the comparison result
+ * @deprecated
  * @example
  * ```ts
  * mjcomp('5s', '6s'); // -> -1
@@ -25,13 +26,7 @@ export const mjtiles = MJ.toArray;
  * mjcomp('5m', '0m'); // -> -0.5, '0m' is between '56m'
  * ```
  */
-export const mjcomp = (a: string, b: string) => {
-  let [a_n, a_t] = a;
-  let [b_n, b_t] = b;
-  if (a_n === '0') a_n = 5.5;
-  if (b_n === '0') b_n = 5.5;
-  return a_t !== b_t ? (a_t < b_t ? -1 : 1) : Number(a_n) - Number(b_n);
-};
+export const mjcomp = MJ.compareTile;
 
 /** All orphan tiles */
 export const MJ_13ORPHAN_TILES = mjtiles('19m19p19s1234567z');
