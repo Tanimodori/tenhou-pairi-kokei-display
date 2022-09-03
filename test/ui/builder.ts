@@ -1,5 +1,6 @@
 import { Window, Document, HTMLElement } from 'happy-dom';
 import { mjtiles } from '@/legacy';
+import { UIInfo } from '@/ui';
 
 /** Test case for ui manipulation */
 export interface TestCaseInput {
@@ -254,4 +255,26 @@ export const buildDocument = (testCase: TestCase) => {
   // mount and return
   document.body.appendChild(container);
   return window;
+};
+
+/**
+ * Get expected uiInfo from testCase
+ * @param testCase test case
+ */
+export const buildUIinfo = (testCase: TestCase) => {
+  const inputTiles = mjtiles(testCase.input);
+  const handTiles = mjtiles(testCase.tiles);
+  const result: UIInfo = {
+    query: {
+      type: testCase.showAllResults ? 'standard' : 'normal',
+      autofill: inputTiles.length !== handTiles.length,
+    },
+    shanten: testCase.calculated.shanten,
+    hand: handTiles,
+    waitings: testCase.calculated.result.map(([discard, tiles]) => ({
+      discard,
+      tiles: mjtiles(tiles),
+    })),
+  };
+  return result;
 };
