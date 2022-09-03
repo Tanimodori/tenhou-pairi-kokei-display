@@ -1,5 +1,4 @@
 import { mjcomp, mjtiles } from '@/legacy';
-import { HandFull } from '@/types/hand';
 
 export interface TextareaInfo {
   /**
