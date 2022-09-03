@@ -1,10 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
 import { Window, Document, HTMLElement } from 'happy-dom';
-import { mjtiles, run } from '@/legacy';
-import { getShantenInfo, getTextareaTiles, getTiles, shantenToNumber } from '@/ui';
+import { mjtiles } from '@/legacy';
 
 /** Test case for ui manipulation */
-interface TestCaseInput {
+export interface TestCaseInput {
   /** The string representation of user input. */
   input: string;
   /**
@@ -55,10 +53,10 @@ interface TestCaseInput {
   };
 }
 
-type TestCase = Required<TestCaseInput>;
+export type TestCase = Required<TestCaseInput>;
 
 /** Sanitize test cases for testing */
-const buildTestCases = (inputs: TestCaseInput[]): TestCase[] => {
+export const buildTestCases = (inputs: TestCaseInput[]): TestCase[] => {
   return inputs.map((input) => ({
     tiles: input.input,
     showAllResults: true,
@@ -66,31 +64,12 @@ const buildTestCases = (inputs: TestCaseInput[]): TestCase[] => {
   }));
 };
 
-const testCases: TestCase[] = buildTestCases([
-  {
-    input: '19m19s19p123456z5m2p',
-    calculated: {
-      shanten: { standard: 1, normal: 7 },
-      result: [
-        ['5m', '19m19s19p123456z', 40],
-        ['2p', '19m19s19p123456z', 40],
-      ],
-    },
-    expected: {
-      result: [
-        ['5m', '19m19s19p123456z', 40, '', 0],
-        ['2p', '19m19s19p123456z', 40, '', 0],
-      ],
-    },
-  },
-]);
-
 /**
  * Construct element for testing
  * @param document the document object
  * @param spec the spec of element
  */
-const buildElement = (document: Document, spec: string | HTMLElement | Record<string, unknown>) => {
+export const buildElement = (document: Document, spec: string | HTMLElement | Record<string, unknown>) => {
   if (typeof spec === 'string') {
     return document.createTextNode(spec);
   }
@@ -121,7 +100,7 @@ const buildElement = (document: Document, spec: string | HTMLElement | Record<st
  * @param document the window document object
  * @param input the content of input
  */
-const buildForm = (document: Document, input: string) => {
+export const buildForm = (document: Document, input: string) => {
   return buildElement(document, {
     _tag: 'form',
     name: 'f',
@@ -141,7 +120,7 @@ const buildForm = (document: Document, input: string) => {
 };
 
 /** Get the tenpai text */
-const getTenpaiText = (shanten: { standard: number; normal: number }) => {
+export const getTenpaiText = (shanten: { standard: number; normal: number }) => {
   const rawText = (x: number) => (x ? `${x}向聴` : `聴牌`);
   const { standard, normal } = shanten;
   if (standard !== normal) {
@@ -156,7 +135,7 @@ const getTenpaiText = (shanten: { standard: number; normal: number }) => {
  * @param document the window document object
  * @param testCase the test case
  */
-const buildHand = (document: Document, testCase: TestCase) => {
+export const buildHand = (document: Document, testCase: TestCase) => {
   const tiles = mjtiles(testCase.tiles).map((tile) =>
     buildElement(document, {
       _tag: 'a',
@@ -178,7 +157,7 @@ const buildHand = (document: Document, testCase: TestCase) => {
  * @param document the window document object
  * @param testCase the test case
  */
-const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
+export const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
   /**
    * transform tile to tenhou tile ID
    * [1..9m][1..9p][1..9s][1..7z] -> [0..33]
@@ -219,7 +198,7 @@ const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
  * Get the textarea content
  * @param testCase the test case
  */
-const buildTextareaContent = (testCase: TestCase) => {
+export const buildTextareaContent = (testCase: TestCase) => {
   // It uses `testCase.input`, not `testCase.tiles`
   const firstLine = `${testCase.input}\n`;
   const mainLines = testCase.calculated.result.map(
@@ -233,7 +212,7 @@ const buildTextareaContent = (testCase: TestCase) => {
  * @param document the window document object
  * @param testCase the test case
  */
-const buildM2Div = (document: Document, testCase: TestCase) => {
+export const buildM2Div = (document: Document, testCase: TestCase) => {
   const standardFormText = [`標準形(七対国士を含む)の計算結果 / `, `一般形`];
   const normalFormText = [`一般形(七対国士を含まない)の計算結果 / `, `標準形`];
   const formText = testCase.showAllResults ? standardFormText : normalFormText;
@@ -263,7 +242,7 @@ const buildM2Div = (document: Document, testCase: TestCase) => {
  * Build document of website
  * @param testCase the test case
  */
-const buildDocument = (testCase: TestCase) => {
+export const buildDocument = (testCase: TestCase) => {
   // create document
   const window = new Window();
   const document = window.document;
@@ -276,41 +255,3 @@ const buildDocument = (testCase: TestCase) => {
   document.body.appendChild(container);
   return window;
 };
-
-describe('Test ui functions', () => {
-  it('shantenToNumber', () => {
-    expect(shantenToNumber('8向聴')).toBe(8);
-    expect(shantenToNumber('聴牌')).toBe(0);
-    expect(shantenToNumber('和了')).toBe(-1);
-  });
-
-  it.each(testCases)('getShantenInfo', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
-    expect(getShantenInfo()).toEqual(testCase.calculated.shanten);
-  });
-
-  it.each(testCases)('getTiles', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
-    expect(getTiles()).toEqual(mjtiles(testCase.tiles));
-  });
-
-  it.each(testCases)('getTextareaTiles', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
-    expect(getTextareaTiles()).toEqual({
-      hand: mjtiles(testCase.tiles),
-      waitings: testCase.calculated.result.map(([discard, tiles]) => ({
-        discard,
-        tiles: mjtiles(tiles),
-      })),
-    });
-  });
-
-  it.each(testCases)('can render table', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
-    run();
-  });
-});
