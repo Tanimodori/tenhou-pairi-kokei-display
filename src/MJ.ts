@@ -78,7 +78,7 @@ export default class MJ {
    * @param tiles the array of tiles to be subtracted by
    * @returns the result of subtraction (shallow copy)
    */
-  static sub(source: string[], ...tiles: string[]) {
+  static sub(source: readonly string[], ...tiles: readonly string[]) {
     const result = [...source];
     for (const tile of tiles) {
       const index = result.findIndex((x) => MJ.toAka(x, false) === MJ.toAka(tile, false));
@@ -96,7 +96,7 @@ export default class MJ {
    * @param tile the tile to search
    * @returns the remaining count
    */
-  static remains(source: string[], tile: string) {
+  static remains(source: readonly string[], tile: string) {
     let result = 4;
     source.forEach((x) => {
       if (MJ.toAka(x, false) === MJ.toAka(tile, false)) {
@@ -111,12 +111,33 @@ export default class MJ {
    * @param source the hand
    * @returns `true` if the hand is a win-hand of 13 orphans, `false` otherwise
    */
-  static is13Orphans(source: string[]) {
+  static is13Orphans(source: readonly string[]) {
     const orphanTiles = MJ.toArray('19m19p19s1234567z');
     if (source.length !== 14) {
       return false;
     }
     const subbed = MJ.sub(source, ...orphanTiles);
     return subbed.length === 1 && orphanTiles.indexOf(subbed[0]) !== -1;
+  }
+
+  /**
+   * Detemine if the hand is a win-hand of 7 pairs
+   * @param source the hand
+   * @returns `true` if the hand is a win-hand of 7 pairs, `false` otherwise
+   */
+  static is7Pairs(source: readonly string[]) {
+    if (source.length !== 14) {
+      return false;
+    }
+    const sorted = source.map((x) => MJ.toAka(x, false)).sort(MJ.compareTile);
+    for (let i = 0; i < source.length - 1; ++i) {
+      if (i % 2 === 0 && sorted[i] !== sorted[i + 1]) {
+        return false;
+      }
+      if (i % 2 === 1 && sorted[i] === sorted[i + 1]) {
+        return false;
+      }
+    }
+    return true;
   }
 }

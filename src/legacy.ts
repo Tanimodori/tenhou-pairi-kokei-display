@@ -79,23 +79,7 @@ export const mjsub = (mjarr: MJArray, ...tiles: string[]) => {
  * @param mjarr the hand
  * @returns `true` if the hand is a win-hand of 7 pairs, `false` otherwise
  */
-export const mj7toi = (mjarr: MJArray) => {
-  if (mjarr.length != 14) {
-    return false;
-  }
-  mjarr.sort(mjcomp);
-  for (let i = 0; i <= 12; i += 2) {
-    if (mjarr[i] !== mjarr[i + 1] && mjarr[i] !== mjaka(mjarr[i + 1])) {
-      return false;
-    }
-    if (i > 0) {
-      if (mjarr[i] === mjarr[i - 2] || mjarr[i] === mjaka(mjarr[i - 2])) {
-        return false;
-      }
-    }
-  }
-  return true;
-};
+export const mj7toi = MJ.is7Pairs;
 
 /**
  * Detemine if the hand is a win-hand of 13 orphans
