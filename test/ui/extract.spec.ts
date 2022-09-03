@@ -1,4 +1,4 @@
-import { mjtiles } from '@/legacy';
+import { getTenpaikeis, mjtiles } from '@/legacy';
 import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles, getUIInfo } from '@/ui';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildDocument, buildUIinfo } from './builder';
@@ -37,5 +37,13 @@ describe.each(testCases)('Extract ui functions', (testCase) => {
   it('getUIInfo', () => {
     const uiInfo = buildUIinfo(testCase);
     expect(getUIInfo()).toEqual(uiInfo);
+  });
+
+  it('getTenpaikeis', () => {
+    const uiInfo = buildUIinfo(testCase);
+    const tenpaikeis = getTenpaikeis(uiInfo);
+    Object.entries(tenpaikeis).forEach(([discard, iishanten]) => {
+      console.log(discard, iishanten);
+    });
   });
 });
