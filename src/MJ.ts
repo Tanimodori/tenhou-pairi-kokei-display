@@ -89,4 +89,20 @@ export default class MJ {
     }
     return result;
   }
+
+  /**
+   * Find the remaining count of same tile in the remaining tiles
+   * @param source the known hand
+   * @param tile the tile to search
+   * @returns the remaining count
+   */
+  static remains(source: string[], tile: string) {
+    let result = 4;
+    source.forEach((x) => {
+      if (MJ.toAka(x, false) === MJ.toAka(tile, false)) {
+        --result;
+      }
+    });
+    return result;
+  }
 }

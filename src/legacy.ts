@@ -60,6 +60,7 @@ export type MJArray = string[] & { mjfail: boolean };
  * @param mjarr the array of tiles to be subtracted from
  * @param tiles the array of tiles to be subtracted by
  * @returns the result of subtraction (no copy)
+ * @deprecated
  */
 export const mjsub = (mjarr: MJArray, ...tiles: string[]) => {
   if (mjarr.mjfail) return;
@@ -181,10 +182,9 @@ export const resetMjagari = (show_all_result = global_show_all_result) => {
  * @param mjarr the known hand
  * @param tile the tile to search
  * @returns the remaining count
+ * @deprecated
  */
-export const mjnokori = (mjarr: MJArray, tile: string) => {
-  return 4 - mjarr.filter((x) => x === tile || x === mjaka(tile)).length;
-};
+export const mjnokori = MJ.remains;
 
 /**
  * Find the waiting tiles of the given hand
