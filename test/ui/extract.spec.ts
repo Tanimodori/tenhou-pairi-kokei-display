@@ -1,5 +1,5 @@
 import { mjtiles } from '@/legacy';
-import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles } from '@/ui';
+import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles, getUIInfo } from '@/ui';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildDocument, buildUIinfo } from './builder';
 import { testCases } from './cases';
@@ -29,8 +29,13 @@ describe.each(testCases)('Extract ui functions', (testCase) => {
   it('getTextareaTiles', () => {
     const uiInfo = buildUIinfo(testCase);
     expect(getTextareaTiles()).toEqual({
-      hand: uiInfo.hand,
+      hand: mjtiles(testCase.tiles),
       waitings: uiInfo.waitings,
     });
+  });
+
+  it('getUIInfo', () => {
+    const uiInfo = buildUIinfo(testCase);
+    expect(getUIInfo()).toEqual(uiInfo);
   });
 });

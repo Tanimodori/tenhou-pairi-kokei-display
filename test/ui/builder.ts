@@ -1,5 +1,5 @@
 import { Window, Document, HTMLElement } from 'happy-dom';
-import { mjtiles } from '@/legacy';
+import { mjcomp, mjtiles } from '@/legacy';
 import { UIInfo } from '@/ui';
 
 /** Test case for ui manipulation */
@@ -270,7 +270,7 @@ export const buildUIinfo = (testCase: TestCase) => {
       autofill: inputTiles.length !== handTiles.length,
     },
     shanten: testCase.calculated.shanten,
-    hand: handTiles,
+    hand: handTiles.sort(mjcomp),
     waitings: testCase.calculated.result.map(([discard, tiles]) => ({
       discard,
       tiles: mjtiles(tiles),
