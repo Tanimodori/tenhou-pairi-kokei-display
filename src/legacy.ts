@@ -230,7 +230,10 @@ export const mjmachi = (mjarr: MJArray) => {
   });
 };
 
-/** The waiting forms of a hand */
+/**
+ * The waiting forms of a hand
+ * @deprecated
+ */
 export interface Tenpaikei {
   /** Maxinum count of waiting tiles of all possible forms*/
   nokori_max: number;
@@ -243,7 +246,10 @@ export interface Tenpaikei {
   };
 }
 
-/** one waiting form of a hand of ii-shan-ten */
+/**
+ * one waiting form of a hand of ii-shan-ten
+ * @deprecated
+ */
 export interface TenpaikeiExtended extends Tenpaikei {
   link: string;
   nokori_self: number;
@@ -253,7 +259,10 @@ export interface TenpaikeiExtended extends Tenpaikei {
   gukeihais: unknown[];
 }
 
-/** ii-shan-ten */
+/**
+ * ii-shan-ten
+ * @deprecated
+ */
 export interface Iishanten {
   koukei: number;
   gukei: number;
