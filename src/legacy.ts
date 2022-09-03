@@ -1,29 +1,17 @@
 import { getUIInfo, inject_css, renderTable, UIInfo, TextareaInfo } from '@/ui';
+import MJ from './MJ';
 
 /**
  * Split a hand into tiles array
  * @param input the hand to be split
  * @returns the tiles array of the hand
+ * @deprecated
  * @example
  * ```ts
  * mjtiles('12m3s0p5z'); // -> ['1m', '2m', '3s', '0p', '5z']
  * ```
  */
-export const mjtiles = (input: string) => {
-  const result = [];
-  let stk = '';
-  for (const tile_i of input) {
-    if ('0' <= tile_i && tile_i <= '9') {
-      stk += tile_i;
-    } else {
-      for (const tile_j of stk) {
-        result.push(tile_j + tile_i);
-      }
-      stk = '';
-    }
-  }
-  return result;
-};
+export const mjtiles = MJ.toArray;
 
 /**
  * Compare two tiles for sorting
