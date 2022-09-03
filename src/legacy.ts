@@ -101,16 +101,13 @@ export const mj7toi = (mjarr: MJArray) => {
  * Detemine if the hand is a win-hand of 13 orphans
  * @param mjarr the hand
  * @returns `true` if the hand is a win-hand of 13 orphans, `false` otherwise
+ * @deprecated
  */
 export const mj13orphan = (mjarr: MJArray) => {
-  if (mjarr.length != 14) {
+  if (mjarr.mjfail) {
     return false;
   }
-  mjsub(mjarr, ...MJ_13ORPHAN_TILES);
-  if (!mjarr.mjfail && MJ_13ORPHAN_TILES.indexOf(mjarr[0]) !== -1) {
-    return true;
-  }
-  return false;
+  return MJ.is13Orphans(mjarr);
 };
 
 /** Cache for a hand if it is valid */

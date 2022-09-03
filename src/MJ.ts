@@ -105,4 +105,18 @@ export default class MJ {
     });
     return result;
   }
+
+  /**
+   * Detemine if the hand is a win-hand of 13 orphans
+   * @param source the hand
+   * @returns `true` if the hand is a win-hand of 13 orphans, `false` otherwise
+   */
+  static is13Orphans(source: string[]) {
+    const orphanTiles = MJ.toArray('19m19p19s1234567z');
+    if (source.length !== 14) {
+      return false;
+    }
+    const subbed = MJ.sub(source, ...orphanTiles);
+    return subbed.length === 1 && orphanTiles.indexOf(subbed[0]) !== -1;
+  }
 }
