@@ -1,9 +1,17 @@
 import { mjcomp, mjtiles } from '@/legacy';
+import { HandFull } from '@/types/hand';
 
+/** @deprecated */
 export interface WaitingInfo {
-  /** Current hand */
+  /**
+   * Current hand
+   *  @deprecated
+   */
   hand: string[];
-  /** Waiting tiles after discards */
+  /**
+   * Waiting tiles after discards
+   * @deprecated
+   */
   waitings: {
     /** the discarded tile */
     discard?: string;
@@ -32,6 +40,7 @@ export interface UIInfo extends WaitingInfo {
     autofill: boolean;
   };
   shanten: UIInfoShanten;
+  handInfo: HandFull;
 }
 
 /**
