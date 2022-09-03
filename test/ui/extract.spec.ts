@@ -1,31 +1,32 @@
 import { mjtiles } from '@/legacy';
 import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles } from '@/ui';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildDocument } from './builder';
 import { testCases } from './cases';
 
-describe('Test ui functions', () => {
+describe('Extract pure functions', () => {
   it('shantenToNumber', () => {
     expect(shantenToNumber('8向聴')).toBe(8);
     expect(shantenToNumber('聴牌')).toBe(0);
     expect(shantenToNumber('和了')).toBe(-1);
   });
+});
 
-  it.each(testCases)('getShantenInfo', (testCase) => {
+describe.each(testCases)('Extract ui functions', (testCase) => {
+  beforeEach(() => {
     const window = buildDocument(testCase);
     vi.stubGlobal('document', window.document);
+  });
+
+  it('getShantenInfo', () => {
     expect(getShantenInfo()).toEqual(testCase.calculated.shanten);
   });
 
-  it.each(testCases)('getTiles', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
+  it('getTiles', () => {
     expect(getTiles()).toEqual(mjtiles(testCase.tiles));
   });
 
-  it.each(testCases)('getTextareaTiles', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
+  it('getTextareaTiles', () => {
     expect(getTextareaTiles()).toEqual({
       hand: mjtiles(testCase.tiles),
       waitings: testCase.calculated.result.map(([discard, tiles]) => ({
