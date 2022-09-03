@@ -1,26 +1,8 @@
 import { mjtiles, run } from '@/legacy';
 import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles } from '@/ui';
 import { describe, it, expect, vi } from 'vitest';
-import { buildDocument, buildTestCases, TestCase } from './builder';
-
-const testCases: TestCase[] = buildTestCases([
-  {
-    input: '19m19s19p123456z5m2p',
-    calculated: {
-      shanten: { standard: 1, normal: 7 },
-      result: [
-        ['5m', '19m19s19p123456z', 40],
-        ['2p', '19m19s19p123456z', 40],
-      ],
-    },
-    expected: {
-      result: [
-        ['5m', '19m19s19p123456z', 40, '', 0],
-        ['2p', '19m19s19p123456z', 40, '', 0],
-      ],
-    },
-  },
-]);
+import { buildDocument } from './builder';
+import { testCases } from './cases';
 
 describe('Test ui functions', () => {
   it('shantenToNumber', () => {
