@@ -68,4 +68,25 @@ export default class MJ {
       return order.indexOf(aNum) - order.indexOf(bNum);
     }
   }
+
+  /**
+   * Subtract tiles from existing tiles.
+   * if source cannot afford subtracting tiles
+   * subtraction of such tiles are omitted
+   * check the length of result if you want to know fails
+   * @param source the array of tiles to be subtracted from
+   * @param tiles the array of tiles to be subtracted by
+   * @returns the result of subtraction (shallow copy)
+   */
+  static sub(source: string[], ...tiles: string[]) {
+    const result = [...source];
+    for (const tile of tiles) {
+      const index = result.findIndex((x) => MJ.toAka(x, false) === MJ.toAka(tile, false));
+      if (index != -1) {
+        result.splice(index, 1);
+        continue;
+      }
+    }
+    return result;
+  }
 }

@@ -59,25 +59,18 @@ export type MJArray = string[] & { mjfail: boolean };
  * Subtract tiles from existing array of tiles.
  * @param mjarr the array of tiles to be subtracted from
  * @param tiles the array of tiles to be subtracted by
- * @returns the result of subtraction
+ * @returns the result of subtraction (no copy)
  */
 export const mjsub = (mjarr: MJArray, ...tiles: string[]) => {
   if (mjarr.mjfail) return;
-  for (const tile of tiles) {
-    let index = mjarr.indexOf(tile);
-    if (index != -1) {
-      mjarr.splice(index, 1);
-      continue;
-    }
-    index = mjarr.indexOf(mjaka(tile));
-    if (index != -1) {
-      mjarr.splice(index, 1);
-      continue;
-    }
+  const result = MJ.sub(mjarr, ...tiles);
+  if (result.length !== mjarr.length - tiles.length) {
     mjarr.mjfail = true;
     return mjarr;
+  } else {
+    mjarr.splice(0, mjarr.length, ...result);
+    return mjarr;
   }
-  return mjarr;
 };
 
 /**
