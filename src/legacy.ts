@@ -288,6 +288,7 @@ export const mjtenpaikei = (mjarr: MJArray) => {
   return result;
 };
 
+/** @deprecated */
 export const getTenpaikeis = (info: WaitingInfo) => {
   const hands = info.hand;
   const tenpaikeis: Record<string, Iishanten> = {};
