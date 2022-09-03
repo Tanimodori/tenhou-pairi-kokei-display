@@ -1,4 +1,4 @@
-import { mjtiles, run } from '@/legacy';
+import { mjtiles } from '@/legacy';
 import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles } from '@/ui';
 import { describe, it, expect, vi } from 'vitest';
 import { buildDocument } from './builder';
@@ -33,11 +33,5 @@ describe('Test ui functions', () => {
         tiles: mjtiles(tiles),
       })),
     });
-  });
-
-  it.each(testCases)('can render table', (testCase) => {
-    const window = buildDocument(testCase);
-    vi.stubGlobal('document', window.document);
-    run();
   });
 });
