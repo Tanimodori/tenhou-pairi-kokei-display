@@ -4,11 +4,18 @@ export interface HandBase {
 
 export interface HandFull extends HandBase {
   shanten: number;
-  discards: [string, HandPartial][];
+  discards: {
+    tile: string;
+    hand: HandPartial;
+  }[];
 }
 
 export interface HandPartial extends HandBase {
-  draws: [string, HandFull][];
+  draws: {
+    tile: string;
+    count: number;
+    hand: HandFull;
+  }[] & { totalCount: number };
 }
 
 export type Hand = HandFull | HandPartial;
