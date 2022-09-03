@@ -1,4 +1,4 @@
-import { getUIInfo, inject_css, renderTable, UIInfo, WaitingInfo } from '@/ui';
+import { getUIInfo, inject_css, renderTable, UIInfo, TextareaInfo } from '@/ui';
 
 /**
  * Split a hand into tiles array
@@ -298,7 +298,7 @@ export const mjtenpaikei = (mjarr: MJArray) => {
 };
 
 /** @deprecated */
-export const getTenpaikeis = (info: WaitingInfo) => {
+export const getTenpaikeis = (info: TextareaInfo) => {
   const hands = info.hand;
   const tenpaikeis: Record<string, Iishanten> = {};
   for (const waiting of info.waitings) {

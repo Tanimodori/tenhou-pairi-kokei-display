@@ -1,16 +1,13 @@
 import { mjcomp, mjtiles } from '@/legacy';
 import { HandFull } from '@/types/hand';
 
-/** @deprecated */
-export interface WaitingInfo {
+export interface TextareaInfo {
   /**
    * Current hand
-   *  @deprecated
    */
   hand: string[];
   /**
    * Waiting tiles after discards
-   * @deprecated
    */
   waitings: {
     /** the discarded tile */
@@ -31,7 +28,7 @@ export interface UIInfoShanten {
 export type ShantenQueryType = 'standard' | 'normal';
 
 /** All UI info */
-export interface UIInfo extends WaitingInfo {
+export interface UIInfo extends TextareaInfo {
   /** query type */
   query: {
     /** `q` flag for `standard`, `p` flag for normal */
@@ -40,7 +37,6 @@ export interface UIInfo extends WaitingInfo {
     autofill: boolean;
   };
   shanten: UIInfoShanten;
-  handInfo: HandFull;
 }
 
 /**
@@ -133,7 +129,7 @@ export const parseTextareaContent = (content: string) => {
   /** Regexp of all valid tiles */
   const pattern = /([0-9]+[mps]|[1-7]+z)+/gm;
   const matches = content.match(pattern);
-  const result: WaitingInfo = {
+  const result: TextareaInfo = {
     hand: [],
     waitings: [],
   };
