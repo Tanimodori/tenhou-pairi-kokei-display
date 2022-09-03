@@ -50,16 +50,9 @@ export let global_show_all_result = false;
  * @returns the equivalent akadora or non-akadora form
  * If the tile has no akadora or non-akadora form,
  * i.e. not one of '50m50s50p', output as-is.
+ * @deprecated
  */
-export const mjaka = (tile: string) => {
-  if ('msp'.indexOf(tile[1]) === -1) {
-    return tile;
-  }
-  if (tile[0] === '0' || tile[0] === '5') {
-    return String(5 - Number(tile[0])) + tile[1];
-  }
-  return tile;
-};
+export const mjaka = MJ.toAka;
 
 /**
  * The array of mj tiles, with `mjfail` indicating whether it is valid

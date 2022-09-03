@@ -22,4 +22,29 @@ export default class MJ {
     }
     return result;
   }
+
+  /**
+   * Transform the tile to the equivalent akadora or non-akadora form
+   * @param input the tile to transform
+   * @param force `true` to transform to aka, `false` to non-aka, `undefined` oppersite
+   * @returns the equivalent akadora or non-akadora form
+   * If the tile has no akadora or non-akadora form,
+   * i.e. not one of '50m50s50p', output as-is.
+   */
+  static toAka(input: string, force?: boolean) {
+    const [num, suit] = input;
+    if ('msp'.indexOf(suit) === -1) {
+      return input;
+    }
+    if (num === '0' || num === '5') {
+      if (force === true) {
+        return '0' + suit;
+      } else if (force === false) {
+        return '5' + suit;
+      } else {
+        return '0' === num ? '5' + suit : '0' + suit;
+      }
+    }
+    return input;
+  }
 }
