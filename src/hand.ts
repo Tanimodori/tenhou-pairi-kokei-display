@@ -67,7 +67,7 @@ export class Hand {
   }
 
   /** Counting how many tiles remains for given tile */
-  remaining(tile: string) {
+  remains(tile: string) {
     const deck = [...tile];
     for (let cur = this.parent; cur; cur = cur.hand.parent) {
       deck.push(cur.tile);
@@ -95,23 +95,23 @@ export class Hand {
   }
 
   /**
-   * Compute all won hands.
+   * Compute all full hands with x shan-ten.
    * Expected to be called on a partial (3n+1) hand
-   * with 0 shanten (tenpai)
+   * with x shanten
    * @returns All child hands
    * @internal
    */
-  _0ShantenPartial() {
+  _xShantenPartial(childPredicate: (this: Hand) => boolean) {
     if (this.tiles.length % 3 !== 1) {
       return [];
     }
     this.children = [];
     for (const tile of Hand.allTiles) {
-      if (MJ.remains(this.tiles, tile) <= 0) {
+      if (this.remains(tile) <= 0) {
         continue;
       }
       const child = this.draw(tile);
-      if (child.isWinHand()) {
+      if (childPredicate.call(child)) {
         this.children.push(child);
       }
     }
@@ -119,23 +119,61 @@ export class Hand {
   }
 
   /**
-   * Compute all partial hands with 0 shan-ten.
+   * @see _xShantenPartial
+   * @internal
+   */
+  _0ShantenPartial() {
+    return this._xShantenPartial(this.isWinHand);
+  }
+
+  /**
+   * @see _xShantenPartial
+   * @internal
+   */
+  _1ShantenPartial() {
+    return this._xShantenPartial(function () {
+      return this._0ShantenFull().length !== 0;
+    });
+  }
+
+  /**
+   * Compute all partial hands with x shan-ten.
    * Expected to be called on a full (3n+2) hand
-   * with 0 shanten (tenpai)
+   * with x shanten (tenpai)
    * @returns All child hands
    * @internal
    */
-  _0ShantenFull() {
+  _xShantenFull(childPredicate: (this: Hand) => boolean) {
     if (this.tiles.length % 3 !== 2) {
       return [];
     }
     this.children = [];
-    for (const tile of this.uniqueTiles()) {
+    for (const tile of this.uniqueTiles(true)) {
       const child = this.discard(tile);
-      if (child._0ShantenPartial().length !== 0) {
+      if (childPredicate.call(child)) {
         this.children.push(child);
       }
     }
     return this.children;
+  }
+
+  /**
+   * @see _xShantenFull
+   * @internal
+   */
+  _0ShantenFull() {
+    return this._xShantenFull(function () {
+      return this._0ShantenPartial().length !== 0;
+    });
+  }
+
+  /**
+   * @see _xShantenFull
+   * @internal
+   */
+  _1ShantenFull() {
+    return this._xShantenFull(function () {
+      return this._1ShantenPartial().length !== 0;
+    });
   }
 }
