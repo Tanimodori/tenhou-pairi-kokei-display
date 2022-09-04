@@ -95,59 +95,28 @@ export const mj13orphan = (mjarr: MJArray) => {
   return MJ.is13Orphans(mjarr);
 };
 
-/** Cache for a hand if it is valid */
-let mjagaricache: Record<string, boolean> = {};
-
 /**
  * Detemine if the hand is a win-hand (Cached version)
  * @param mjarr the hand
  * @returns `true` if the hand is a win-hand , `false` otherwise
+ * @deprecated
  */
 export const mjagari = (mjarr: MJArray, show_all_result = global_show_all_result) => {
   if (mjarr.mjfail || mjarr.length % 3 === 1) return false;
-  if (mjarr.length == 0) {
-    return true;
-  }
   if (show_all_result) {
-    if (mj7toi([...mjarr])) return true;
-    if (mj13orphan([...mjarr])) return true;
+    return MJ.isWinHand(mjarr);
+  } else {
+    return MJ.isNormalWinHand(mjarr);
   }
-  const joined_result = mjarr.sort(mjcomp).join('').replace('0', '5');
-  if (joined_result in mjagaricache) {
-    return mjagaricache[joined_result];
-  }
-  const result = mjagari_raw(mjarr);
-  mjagaricache[joined_result] = result;
-  return result;
 };
 
 /**
  * Detemine if the hand is a win-hand (Non-cached version)
  * @param mjarr the hand
  * @returns `true` if the hand is a win-hand , `false` otherwise
+ * @deprecated
  */
-export const mjagari_raw = (mjarr: MJArray) => {
-  const tile = mjarr[0];
-  const [tile_num, tile_type] = tile;
-  // toitsu
-  if (mjarr.length % 3 === 2) {
-    if (mjagari(mjsub([...mjarr], tile, tile), false)) return true;
-  }
-  // kootsu
-  if (mjagari(mjsub([...mjarr], tile, tile, tile), false)) return true;
-  // shuntsu
-  if (tile_type !== 'z') {
-    let tile_number = Number(tile_num);
-    if (tile_number === 0) tile_number = 5;
-    const shuntsu_tiles_groups = [tile_number - 2, tile_number - 1, tile_number]
-      .filter((x) => x >= 1 && x <= 7)
-      .map((x) => [x + tile_type, x + 1 + tile_type, x + 2 + tile_type]);
-    for (const s_tiles of shuntsu_tiles_groups) {
-      if (mjagari(mjsub([...mjarr], ...s_tiles), false)) return true;
-    }
-  }
-  return false;
-};
+export const mjagari_raw = MJ.isNormalWinHand;
 
 /**
  * Temp fix for testing mjagari
@@ -156,7 +125,6 @@ export const mjagari_raw = (mjarr: MJArray) => {
  */
 export const resetMjagari = (show_all_result = global_show_all_result) => {
   global_show_all_result = show_all_result;
-  mjagaricache = {};
 };
 
 /**
