@@ -1,3 +1,5 @@
+export type Suits = Record<string, string[]>;
+
 export default class MJ {
   /**
    * Split a hand into tiles array
@@ -46,6 +48,14 @@ export default class MJ {
       }
     }
     return input;
+  }
+
+  /**
+   * Normalize tiles to non-akadora, sorted form
+   * @param source input to be normalized
+   */
+  static normalize(source: readonly string[]) {
+    return source.map((x) => MJ.toAka(x, false)).sort(MJ.compareTile);
   }
 
   /**
@@ -129,7 +139,7 @@ export default class MJ {
     if (source.length !== 14) {
       return false;
     }
-    const sorted = source.map((x) => MJ.toAka(x, false)).sort(MJ.compareTile);
+    const sorted = MJ.normalize(source);
     for (let i = 0; i < source.length - 1; ++i) {
       if (i % 2 === 0 && sorted[i] !== sorted[i + 1]) {
         return false;
@@ -139,5 +149,119 @@ export default class MJ {
       }
     }
     return true;
+  }
+
+  /**
+   * Split hand by suit type
+   * @param source the source hand to be splitted
+   */
+  static splitSuits(source: readonly string[]): Suits {
+    const result = {} as Suits;
+    for (const suit of 'mpsz') {
+      result[suit] = MJ.normalize(source).filter((x) => x[1] === suit);
+    }
+    return result;
+  }
+
+  /**
+   * Finding the suit with pair for a normal win hand
+   * If the input is not valid, returns null
+   * @param suits the suits
+   */
+  static findSuitWithPair(suits: Suits) {
+    let suitWithPair: string | null = null;
+    // check every suit count
+    for (const suit of 'mpsz') {
+      const lengthMod3 = suits[suit].length % 3;
+      if (lengthMod3 === 2) {
+        if (!suitWithPair) {
+          suitWithPair = suit;
+        } else {
+          return null;
+        }
+      } else if (lengthMod3 === 1) {
+        return null;
+      }
+    }
+    return suitWithPair;
+  }
+
+  /**
+   * Tells if tiles are composible by melds and a optional pair
+   * @param source the source
+   * @param withPair whether the source contains pairs,
+   * if omitted it is judged by length of source
+   */
+  static allMelds(source: readonly string[], withPair?: boolean) {
+    // length guard
+    if (source.length === 0) {
+      return true;
+    }
+    withPair ??= source.length % 3 === 2;
+    if (withPair && source.length % 3 !== 2) {
+      return false;
+    }
+    if (!withPair && source.length % 3 !== 0) {
+      return false;
+    }
+    // trys pair, pong, chew
+    const sorted = MJ.normalize(source);
+    const tryComb = (comb: string[], newWithPair = withPair) => {
+      const subbed = MJ.sub(sorted, ...comb);
+      return subbed.length === sorted.length - comb.length && MJ.allMelds(subbed, newWithPair);
+    };
+    // pair
+    if (withPair) {
+      if (tryComb([sorted[0], sorted[0]], false)) {
+        return true;
+      }
+    }
+    // pong
+    if (sorted.length >= 3) {
+      if (tryComb([sorted[0], sorted[0], sorted[0]])) {
+        return true;
+      }
+      if (sorted[0][1] < '8' && sorted[0][1] !== 'z') {
+        const addToTile = (t: string, a: number) => String.fromCharCode(t.charCodeAt(0) + a) + t[1];
+        if (tryComb([sorted[0], addToTile(sorted[0], 1), addToTile(sorted[0], 2)])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Tells if tiles are composible by melds and a pair,
+   * This function is optimize to split suits
+   * Prefer using it instead of `allMelds`
+   * @param source the source
+   * @see allMelds
+   */
+  static isNormalWinHand(source: readonly string[]) {
+    if (source.length % 3 !== 2) {
+      return false;
+    }
+    const suits = MJ.splitSuits(source);
+    const suitWithPair = MJ.findSuitWithPair(suits);
+    if (!suitWithPair) {
+      return false;
+    }
+    for (const suitType of 'mpsz') {
+      if (!MJ.allMelds(suits[suitType], suitType === suitWithPair)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Tells if tiles are composible by melds and a pair, 13 orphans, 7 pairs
+   * @param source the source
+   * @see isNormalWinHand
+   * @see allMelds
+   */
+  static isWinHand(source: readonly string[]) {
+    return MJ.is13Orphans(source) || MJ.is7Pairs(source) || MJ.isNormalWinHand(source);
   }
 }

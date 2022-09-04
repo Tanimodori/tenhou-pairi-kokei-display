@@ -78,6 +78,7 @@ export const mjsub = (mjarr: MJArray, ...tiles: string[]) => {
  * Detemine if the hand is a win-hand of 7 pairs
  * @param mjarr the hand
  * @returns `true` if the hand is a win-hand of 7 pairs, `false` otherwise
+ * @deprecated
  */
 export const mj7toi = MJ.is7Pairs;
 
