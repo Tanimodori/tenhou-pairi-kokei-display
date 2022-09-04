@@ -140,13 +140,10 @@ export const mjnokori = MJ.remains;
  * Find the waiting tiles of the given hand
  * @param mjarr the hand
  * @returns the waiting tiles
+ * @deprecated
  */
 export const mjmachi = (mjarr: MJArray) => {
-  if (mjarr.length % 3 !== 1) return [];
-  return MJ_TILES.filter((tile) => {
-    if (mjnokori(mjarr, tile) === 0) return false; // ikasama
-    return mjagari([...mjarr, tile]);
-  });
+  return MJ.findWaitingTiles(mjarr, global_show_all_result ? MJ.isWinHand : MJ.isNormalWinHand);
 };
 
 /**

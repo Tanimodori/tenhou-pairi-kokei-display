@@ -1,4 +1,5 @@
 export type Suits = Record<string, string[]>;
+export type HandPredicate = (source: readonly string[]) => boolean;
 
 export default class MJ {
   /**
@@ -263,5 +264,16 @@ export default class MJ {
    */
   static isWinHand(source: readonly string[]) {
     return MJ.is13Orphans(source) || MJ.is7Pairs(source) || MJ.isNormalWinHand(source);
+  }
+
+  /**
+   * Find waiting tiles of partial hand
+   * @param source the partial hand
+   * @param predicate How a hand is counted as win hand, e.g. MJ.isWinHand or MJ.isNormalWinHand
+   */
+  static findWaitingTiles(source: readonly string[], predicate: HandPredicate = MJ.isWinHand) {
+    if (source.length % 3 !== 1) return [];
+    const allTiles = MJ.toArray('123456789m123456789p123456789s1234567z');
+    return allTiles.filter((tile) => MJ.remains(source, tile) > 0 && predicate([...source, tile]));
   }
 }
