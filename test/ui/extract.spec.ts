@@ -1,3 +1,4 @@
+import { Hand } from '@/hand';
 import { getTenpaikeis, mjtiles } from '@/legacy';
 import { shantenToNumber, getShantenInfo, getTiles, getTextareaTiles, getUIInfo } from '@/ui';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -42,8 +43,22 @@ describe.each(testCases)('Extract ui functions', (testCase) => {
   it('getTenpaikeis', () => {
     const uiInfo = buildUIinfo(testCase);
     const tenpaikeis = getTenpaikeis(uiInfo);
+    /*
     Object.entries(tenpaikeis).forEach(([discard, iishanten]) => {
       console.log(discard, iishanten);
     });
+    */
+  });
+
+  it('Hand', () => {
+    const hand = new Hand('1122m3344556677s', 'normal');
+    hand._1ShantenFull();
+    const printHand = (source: Hand, pre = '>') => {
+      console.log(pre + source.tiles.join(''));
+      for (const child of source.children) {
+        printHand(child, '-' + pre);
+      }
+    };
+    printHand(hand);
   });
 });
