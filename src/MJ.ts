@@ -221,7 +221,7 @@ export default class MJ {
       if (tryComb([sorted[0], sorted[0], sorted[0]])) {
         return true;
       }
-      if (sorted[0][1] < '8' && sorted[0][1] !== 'z') {
+      if (sorted[0][0] < '8' && sorted[0][1] !== 'z') {
         const addToTile = (t: string, a: number) => String.fromCharCode(t.charCodeAt(0) + a) + t[1];
         if (tryComb([sorted[0], addToTile(sorted[0], 1), addToTile(sorted[0], 2)])) {
           return true;
