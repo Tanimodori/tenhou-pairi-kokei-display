@@ -52,7 +52,7 @@ describe.each(testCases)('Extract ui functions', (testCase) => {
 
   it.skip('Hand', () => {
     const hand = new Hand('1122m3344556677s', 'normal');
-    hand._1ShantenFull();
+    hand.mockShanten(1);
     const printHand = (source: Hand, pre = '>') => {
       console.log(pre + source.tiles.join(''));
       for (const child of source.children) {

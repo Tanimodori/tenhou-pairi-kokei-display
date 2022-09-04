@@ -123,6 +123,7 @@ export class Hand {
    * @internal
    */
   _0ShantenPartial() {
+    this.shanten = 0;
     return this._xShantenPartial(this.isWinHand);
   }
 
@@ -131,6 +132,7 @@ export class Hand {
    * @internal
    */
   _1ShantenPartial() {
+    this.shanten = 1;
     return this._xShantenPartial(function () {
       return this._0ShantenFull().length !== 0;
     });
@@ -162,6 +164,7 @@ export class Hand {
    * @internal
    */
   _0ShantenFull() {
+    this.shanten = 0;
     return this._xShantenFull(function () {
       return this._0ShantenPartial().length !== 0;
     });
@@ -172,8 +175,29 @@ export class Hand {
    * @internal
    */
   _1ShantenFull() {
+    this.shanten = 1;
     return this._xShantenFull(function () {
       return this._1ShantenPartial().length !== 0;
     });
+  }
+
+  /**
+   * Mock shanten calculation
+   * @param shanten the pre-calculated shanten
+   * @returns the children
+   */
+  mockShanten(shanten: number) {
+    const lengthMod3 = this.tiles.length % 3;
+    if (lengthMod3 === 0) {
+      throw new Error(`Invalid tiles length ${shanten} to have shantens`);
+    }
+    this.shanten = shanten;
+    if (shanten === 0) {
+      return lengthMod3 === 2 ? this._0ShantenFull() : this._0ShantenPartial();
+    } else if (shanten === 1) {
+      return lengthMod3 === 2 ? this._1ShantenFull() : this._1ShantenPartial();
+    } else {
+      return [];
+    }
   }
 }
