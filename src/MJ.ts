@@ -270,6 +270,7 @@ export default class MJ {
    * Find waiting tiles of partial hand
    * @param source the partial hand
    * @param predicate How a hand is counted as win hand, e.g. MJ.isWinHand or MJ.isNormalWinHand
+   * @deprecated
    */
   static findWaitingTiles(source: readonly string[], predicate: HandPredicate = MJ.isWinHand) {
     if (source.length % 3 !== 1) return [];
