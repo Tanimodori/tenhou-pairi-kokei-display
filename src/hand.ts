@@ -1,4 +1,4 @@
-import { mjaka, mjcomp, mjsub, mjtiles } from '@/legacy';
+import MJ from './MJ';
 
 /** Mahjong hand */
 export class Hand {
@@ -21,11 +21,10 @@ export class Hand {
   /** constructor of hand */
   constructor(tiles: string | string[]) {
     if (typeof tiles === 'string') {
-      this.tiles = mjtiles(tiles);
+      this.tiles = MJ.toArray(tiles);
     } else {
       this.tiles = tiles;
     }
-    this.tiles.sort(mjcomp);
     this.children = [];
   }
 
@@ -36,7 +35,7 @@ export class Hand {
 
   /** Generate new hand by discarding tile */
   discard(tile: string) {
-    const result = new Hand(mjsub(this.tiles, tile));
+    const result = new Hand(MJ.sub(this.tiles, tile));
     result.parent = { hand: this, type: 'discard', tile };
     this.children.push(result);
     return result;
@@ -52,14 +51,11 @@ export class Hand {
 
   /** Counting how many tiles remains for given tile */
   remaining(tile: string) {
-    const mjequal = (a: string, b: string) => a === b || a === mjaka(b);
-    let result = 4;
-    this.tiles.forEach((x) => mjequal(x, tile) && --result);
-    let cur = this.parent;
-    while (cur) {
-      mjequal(cur.tile ?? '', tile) && --result;
-      cur = cur.hand.parent;
+    const deck = [...tile];
+    for (let cur = this.parent; cur; cur = cur.hand.parent) {
+      deck.push(cur.tile);
     }
+    const result = MJ.remains(deck, tile);
     if (result < 0) {
       throw new Error(`tile "${tile}" has more than 4 tiles`);
     }
