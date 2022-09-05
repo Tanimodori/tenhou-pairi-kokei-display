@@ -1,4 +1,5 @@
-import { getUIInfo, inject_css, renderTable, UIInfo, TextareaInfo } from '@/ui';
+import { getUIInfo, inject_css, renderTableLegacy, UIInfo, TextareaInfo, renderTable } from '@/ui';
+import { Hand } from './hand';
 import MJ from './MJ';
 
 /**
@@ -279,5 +280,9 @@ export const run = () => {
   // calculate tenpaikei
   const tenpaikeis = getTenpaikeis(uiInfo);
   // display tenpaikei
-  renderTable(tenpaikeis);
+  renderTableLegacy(tenpaikeis);
+
+  const hand = new Hand(uiInfo.hand, queryType);
+  hand.mockShanten(1);
+  document.querySelector('#m2 > table')?.after(renderTable(hand));
 };

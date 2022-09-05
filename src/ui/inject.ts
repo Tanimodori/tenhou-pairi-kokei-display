@@ -1,4 +1,6 @@
+import { Hand } from '@/hand';
 import { Iishanten, mjcomp, mjtiles, MJ_TILES, Tenpaikei } from '@/legacy';
+import MJ from '@/MJ';
 import style from '@/style/index.less?inline';
 
 /** Inject Css style to the page */
@@ -12,12 +14,14 @@ export const inject_css = () => {
 /**
  * Creating tile image element of given tile
  * @param tile the tile
+ * @param setClass whether or not set class of img
  * @returns the image element
  */
-export const create_node_tile_img = (tile: string) => {
+export const create_node_tile_img = (tile?: string, setClass = false) => {
   const img_node = document.createElement('img');
-  img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
+  tile && img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
   img_node.setAttribute('border', '0');
+  setClass && img_node.setAttribute('class', 'D');
   return img_node;
 };
 
@@ -108,7 +112,7 @@ export const mouse_out_node = (node: HTMLElement) => {
   popup.classList.toggle('show');
 };
 
-export const renderTable = (tenpaikeis: Record<string, Iishanten>) => {
+export const renderTableLegacy = (tenpaikeis: Record<string, Iishanten>) => {
   const trs = document.querySelectorAll('#m2 tr');
   const sutehais = Object.keys(tenpaikeis);
   for (let i = 0; i < sutehais.length; ++i) {
@@ -171,4 +175,40 @@ export const renderTable = (tenpaikeis: Record<string, Iishanten>) => {
       td_anchor,
     );
   }
+};
+
+export const renderTableRow = (hand: Hand) => {
+  const tr = document.createElement('tr');
+  const tdDatas = [
+    '打',
+    create_node_tile_img(hand.parent?.tile, true),
+    '摸[',
+    hand.children.map((child) => create_node_tile_img(child.parent?.tile)),
+    '??枚',
+    ']',
+  ];
+  const tds = tdDatas.map((data) => {
+    const td = document.createElement('td');
+    if (Array.isArray(data)) {
+      td.append(...data);
+    } else {
+      td.append(data);
+    }
+    return td;
+  });
+  tr.append(...tds);
+  return tr;
+};
+
+export const renderTable = (hand: Hand) => {
+  const table = document.createElement('table');
+  table.setAttribute('cellpadding', '2');
+  table.setAttribute('cellspacing', '0');
+  const tbody = document.createElement('tbody');
+  const children = hand.children.sort((a, b) => MJ.compareTile(a.parent?.tile ?? '', b.parent?.tile ?? ''));
+  for (const child of children) {
+    tbody.append(renderTableRow(child));
+  }
+  table.appendChild(tbody);
+  return table;
 };
