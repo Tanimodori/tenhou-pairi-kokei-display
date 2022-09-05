@@ -79,11 +79,11 @@ export default class MJ {
       let aNum = a.charCodeAt(0);
       let bNum = b.charCodeAt(0);
       // '0'
-      if (aNum === 52) {
-        aNum = 57.5;
+      if (aNum === 48) {
+        aNum = 53.5;
       }
-      if (bNum === 52) {
-        bNum = 57.5;
+      if (bNum === 48) {
+        bNum = 53.5;
       }
       return aNum - bNum;
     }
@@ -198,6 +198,43 @@ export default class MJ {
 
   /**
    * Tells if tiles are composible by melds and a optional pair
+   * No normalization is done
+   * @param source the source
+   * @param withPair whether the source contains pairs
+   * @internal
+   */
+  static _allMeldsLoop(inner: readonly string[], withPair?: boolean) {
+    if (inner.length === 0) {
+      return true;
+    }
+    // trys pair, pong, chew
+    const tryComb = (comb: string[], newWithPair = withPair) => {
+      const subbed = MJ.sub(inner, ...comb);
+      return subbed.length === inner.length - comb.length && MJ._allMeldsLoop(subbed, newWithPair);
+    };
+    // pair
+    if (withPair) {
+      if (tryComb([inner[0], inner[0]], false)) {
+        return true;
+      }
+    }
+    // pong
+    if (inner.length >= 3) {
+      if (tryComb([inner[0], inner[0], inner[0]])) {
+        return true;
+      }
+      if (inner[0][0] < '8' && inner[0][1] !== 'z') {
+        const addToTile = (t: string, a: number) => String.fromCharCode(t.charCodeAt(0) + a) + t[1];
+        if (tryComb([inner[0], addToTile(inner[0], 1), addToTile(inner[0], 2)])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Tells if tiles are composible by melds and a optional pair
    * @param source the source
    * @param withPair whether the source contains pairs,
    * if omitted it is judged by length of source
@@ -214,31 +251,8 @@ export default class MJ {
     if (!withPair && source.length % 3 !== 0) {
       return false;
     }
-    // trys pair, pong, chew
     const sorted = MJ.normalize(source);
-    const tryComb = (comb: string[], newWithPair = withPair) => {
-      const subbed = MJ.sub(sorted, ...comb);
-      return subbed.length === sorted.length - comb.length && MJ.allMelds(subbed, newWithPair);
-    };
-    // pair
-    if (withPair) {
-      if (tryComb([sorted[0], sorted[0]], false)) {
-        return true;
-      }
-    }
-    // pong
-    if (sorted.length >= 3) {
-      if (tryComb([sorted[0], sorted[0], sorted[0]])) {
-        return true;
-      }
-      if (sorted[0][0] < '8' && sorted[0][1] !== 'z') {
-        const addToTile = (t: string, a: number) => String.fromCharCode(t.charCodeAt(0) + a) + t[1];
-        if (tryComb([sorted[0], addToTile(sorted[0], 1), addToTile(sorted[0], 2)])) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return MJ._allMeldsLoop(sorted, withPair);
   }
 
   /**
