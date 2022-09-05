@@ -1,4 +1,4 @@
-import { Hand } from '@/hand';
+import { Hand, HandWithParent } from '@/hand';
 import { Iishanten, mjcomp, mjtiles, MJ_TILES, Tenpaikei } from '@/legacy';
 import MJ from '@/MJ';
 import style from '@/style/index.less?inline';
@@ -17,9 +17,9 @@ export const inject_css = () => {
  * @param setClass whether or not set class of img
  * @returns the image element
  */
-export const create_node_tile_img = (tile?: string, setClass = false) => {
+export const create_node_tile_img = (tile: string, setClass = false) => {
   const img_node = document.createElement('img');
-  tile && img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
+  img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
   img_node.setAttribute('border', '0');
   setClass && img_node.setAttribute('class', 'D');
   return img_node;
@@ -177,14 +177,39 @@ export const renderTableLegacy = (tenpaikeis: Record<string, Iishanten>) => {
   }
 };
 
-export const renderTableRow = (hand: Hand) => {
+export const sortHandByParentTile = (children: HandWithParent[]) => {
+  return children.sort((a, b) => MJ.compareTile(a.parent.tile, b.parent.tile));
+};
+
+export const get0ShantenFullAnchors = (hand: HandWithParent) => {
+  return create_node_tile_img(hand.parent.tile);
+};
+
+export const getTotalTileCounts = (children: HandWithParent[]) => {
+  return children.reduce((a, x) => a + x.parent.tileCount, 0);
+};
+
+export const renderTableRow = (hand: HandWithParent) => {
   const tr = document.createElement('tr');
+  // row is 0ShantenFull
+  const koukeis = sortHandByParentTile(hand.children.filter((x) => x.parent.tileCount > 4));
+  const gukeis = sortHandByParentTile(hand.children.filter((x) => x.parent.tileCount <= 4));
+  const koukeiCount = getTotalTileCounts(koukeis);
+  const gukeiCount = getTotalTileCounts(gukeis);
+  const totalCount = koukeiCount + gukeiCount;
+  console.log(koukeiCount, gukeiCount, totalCount);
   const tdDatas = [
     '打',
-    create_node_tile_img(hand.parent?.tile, true),
+    create_node_tile_img(hand.parent.tile, true),
     '摸[',
-    hand.children.map((child) => create_node_tile_img(child.parent?.tile)),
-    '??枚',
+    koukeis.map(get0ShantenFullAnchors),
+    koukeiCount ? `好形${koukeiCount}枚` : ``,
+    totalCount ? '+' : '',
+    koukeis.map(get0ShantenFullAnchors),
+    gukeiCount ? `愚形${koukeiCount}枚` : ``,
+    `=`,
+    `${totalCount}枚`,
+    `（好形率${Math.round((100 * koukeiCount) / totalCount)}%）`,
     ']',
   ];
   const tds = tdDatas.map((data) => {
@@ -205,7 +230,7 @@ export const renderTable = (hand: Hand) => {
   table.setAttribute('cellpadding', '2');
   table.setAttribute('cellspacing', '0');
   const tbody = document.createElement('tbody');
-  const children = hand.children.sort((a, b) => MJ.compareTile(a.parent?.tile ?? '', b.parent?.tile ?? ''));
+  const children = sortHandByParentTile(hand.children);
   for (const child of children) {
     tbody.append(renderTableRow(child));
   }
