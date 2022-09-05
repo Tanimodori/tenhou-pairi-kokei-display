@@ -1,5 +1,19 @@
 import MJ, { HandPredicate } from './MJ';
 
+/** The parent info */
+export interface HandParent {
+  /** The parent hand which generates this hand */
+  hand: Hand;
+  /** The method that this hand is generated from */
+  type: 'discard' | 'draw';
+  /** The tile discarded or drawn when generated */
+  tile: string;
+  /** The tile count of total available */
+  tileCount: number;
+}
+
+export type HandWithParent = Hand & { parent: HandParent };
+
 /** Mahjong hand */
 export class Hand {
   static allTiles = MJ.toArray('123456789m123456789p123456789s1234567z');
@@ -10,18 +24,9 @@ export class Hand {
   /** Tiles of the hand */
   tiles: string[];
   /** The parent info */
-  parent?: {
-    /** The parent hand which generates this hand */
-    hand: Hand;
-    /** The method that this hand is generated from */
-    type: 'discard' | 'draw';
-    /** The tile discarded or drawn when generated */
-    tile: string;
-    /** The tile count of total available */
-    tileCount: number;
-  };
+  parent?: HandParent;
   /** The children info */
-  children: Hand[];
+  children: HandWithParent[];
   /** The shanten of this hand, currently not computable */
   shanten?: number;
   /** The predicate of this hand */
@@ -55,19 +60,19 @@ export class Hand {
   }
 
   /** Generate new hand by discarding tile */
-  discard(tile: string) {
+  discard(tile: string): HandWithParent {
     const result = new Hand(MJ.sub(this.tiles, tile), this.predicate);
     result.parent = { hand: this, type: 'discard', tile, tileCount: -1 };
     result.parent.tileCount = result.remains(tile);
-    return result;
+    return result as HandWithParent;
   }
 
   /** Generate new hand by drawing tile */
-  draw(tile: string) {
+  draw(tile: string): HandWithParent {
     const result = new Hand([...this.tiles, tile], this.predicate);
     result.parent = { hand: this, type: 'draw', tile, tileCount: -1 };
     result.parent.tileCount = result.remains(tile);
-    return result;
+    return result as HandWithParent;
   }
 
   /** Counting how many tiles remains for given tile */
