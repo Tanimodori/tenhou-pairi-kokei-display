@@ -278,9 +278,9 @@ export const run = () => {
   inject_css();
 
   // calculate tenpaikei
-  // const tenpaikeis = getTenpaikeis(uiInfo);
+  const tenpaikeis = getTenpaikeis(uiInfo);
   // display tenpaikei
-  // renderTableLegacy(tenpaikeis);
+  renderTableLegacy(tenpaikeis);
 
   const hand = new Hand(uiInfo.hand, queryType);
   hand.mockShanten(1);

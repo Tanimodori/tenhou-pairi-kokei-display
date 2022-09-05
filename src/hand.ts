@@ -77,9 +77,11 @@ export class Hand {
 
   /** Counting how many tiles remains for given tile */
   remains(tile: string) {
-    const deck = [...tile];
+    const deck = [...this.tiles];
     for (let cur = this.parent; cur; cur = cur.hand.parent) {
-      deck.push(cur.tile);
+      if (cur.type === 'discard') {
+        deck.push(cur.tile);
+      }
     }
     const result = MJ.remains(deck, tile);
     if (result < 0) {

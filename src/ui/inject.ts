@@ -177,27 +177,57 @@ export const renderTableLegacy = (tenpaikeis: Record<string, Iishanten>) => {
   }
 };
 
+export const getTotalTileCounts = (children: HandWithParent[]) => {
+  return children.reduce((a, x) => a + x.parent.tileCount, 0);
+};
+
 export const sortHandByParentTile = (children: HandWithParent[]) => {
   return children.sort((a, b) => MJ.compareTile(a.parent.tile, b.parent.tile));
+};
+
+export const sortHandByParentTileAndCount = (children: HandWithParent[]) => {
+  return children.sort((a, b) => {
+    const aNum = getTotalTileCounts(a.children);
+    const bNum = getTotalTileCounts(b.children);
+    return aNum !== bNum ? bNum - aNum : MJ.compareTile(a.parent.tile, b.parent.tile);
+  });
 };
 
 export const get0ShantenFullAnchors = (hand: HandWithParent) => {
   return create_node_tile_img(hand.parent.tile);
 };
 
-export const getTotalTileCounts = (children: HandWithParent[]) => {
-  return children.reduce((a, x) => a + x.parent.tileCount, 0);
+export const isKoukei = (hand: Hand) => {
+  // hand is 0ShantenFull
+  //  child is 0ShantenPartial
+  for (const child of hand.children) {
+    const waitingCount = getTotalTileCounts(child.children);
+    if (waitingCount > 4) {
+      return true;
+    }
+  }
+  return false;
 };
 
 export const renderTableRow = (hand: HandWithParent) => {
   const tr = document.createElement('tr');
-  // row is 0ShantenFull
-  const koukeis = sortHandByParentTile(hand.children.filter((x) => x.parent.tileCount > 4));
-  const gukeis = sortHandByParentTile(hand.children.filter((x) => x.parent.tileCount <= 4));
+  // hand is 1ShantenPartial
+  let koukeis: HandWithParent[] = [];
+  let gukeis: HandWithParent[] = [];
+  // child is 0ShantenFull
+  for (const child of hand.children) {
+    const isChildKoukei = isKoukei(child);
+    if (isChildKoukei) {
+      koukeis.push(child);
+    } else {
+      gukeis.push(child);
+    }
+  }
+  koukeis = sortHandByParentTile(koukeis);
+  gukeis = sortHandByParentTile(gukeis);
   const koukeiCount = getTotalTileCounts(koukeis);
   const gukeiCount = getTotalTileCounts(gukeis);
   const totalCount = koukeiCount + gukeiCount;
-  console.log(koukeiCount, gukeiCount, totalCount);
   const tdDatas = [
     '打',
     create_node_tile_img(hand.parent.tile, true),
@@ -205,8 +235,8 @@ export const renderTableRow = (hand: HandWithParent) => {
     koukeis.map(get0ShantenFullAnchors),
     koukeiCount ? `好形${koukeiCount}枚` : ``,
     totalCount ? '+' : '',
-    koukeis.map(get0ShantenFullAnchors),
-    gukeiCount ? `愚形${koukeiCount}枚` : ``,
+    gukeis.map(get0ShantenFullAnchors),
+    gukeiCount ? `愚形${gukeiCount}枚` : ``,
     `=`,
     `${totalCount}枚`,
     `（好形率${Math.round((100 * koukeiCount) / totalCount)}%）`,
@@ -230,7 +260,7 @@ export const renderTable = (hand: Hand) => {
   table.setAttribute('cellpadding', '2');
   table.setAttribute('cellspacing', '0');
   const tbody = document.createElement('tbody');
-  const children = sortHandByParentTile(hand.children);
+  const children = sortHandByParentTileAndCount(hand.children);
   for (const child of children) {
     tbody.append(renderTableRow(child));
   }
