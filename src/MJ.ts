@@ -35,18 +35,16 @@ export default class MJ {
    * i.e. not one of '50m50s50p', output as-is.
    */
   static toAka(input: string, force?: boolean) {
-    const num = input[0];
-    const suit = input[1];
-    if (suit !== 'm' && suit !== 'p' && suit !== 's') {
+    if (input[1] !== 'm' && input[1] !== 'p' && input[1] !== 's') {
       return input;
     }
-    if (num === '0' || num === '5') {
+    if (input[0] === '0' || input[0] === '5') {
       if (force === true) {
-        return '0' + suit;
+        return '0' + input[1];
       } else if (force === false) {
-        return '5' + suit;
+        return '5' + input[1];
       } else {
-        return '0' === num ? '5' + suit : '0' + suit;
+        return '0' === input[0] ? '5' + input[1] : '0' + input[1];
       }
     }
     return input;
@@ -168,7 +166,7 @@ export default class MJ {
   static splitSuits(source: readonly string[]): Suits {
     const result = {} as Suits;
     for (const suit of 'mpsz') {
-      result[suit] = MJ.normalize(source.filter((x) => x[1] === suit));
+      result[suit] = source.filter((x) => x[1] === suit);
     }
     return result;
   }
