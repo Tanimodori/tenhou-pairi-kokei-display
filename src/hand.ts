@@ -17,6 +17,8 @@ export class Hand {
     type: 'discard' | 'draw';
     /** The tile discarded or drawn when generated */
     tile: string;
+    /** The tile count of total available */
+    tileCount: number;
   };
   /** The children info */
   children: Hand[];
@@ -55,14 +57,16 @@ export class Hand {
   /** Generate new hand by discarding tile */
   discard(tile: string) {
     const result = new Hand(MJ.sub(this.tiles, tile), this.predicate);
-    result.parent = { hand: this, type: 'discard', tile };
+    result.parent = { hand: this, type: 'discard', tile, tileCount: -1 };
+    result.parent.tileCount = result.remains(tile);
     return result;
   }
 
   /** Generate new hand by drawing tile */
   draw(tile: string) {
     const result = new Hand([...this.tiles, tile], this.predicate);
-    result.parent = { hand: this, type: 'draw', tile };
+    result.parent = { hand: this, type: 'draw', tile, tileCount: -1 };
+    result.parent.tileCount = result.remains(tile);
     return result;
   }
 
