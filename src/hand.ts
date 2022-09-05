@@ -63,7 +63,7 @@ export class Hand {
   discard(tile: string): HandWithParent {
     const result = new Hand(MJ.sub(this.tiles, tile), this.predicate);
     result.parent = { hand: this, type: 'discard', tile, tileCount: -1 };
-    result.parent.tileCount = result.remains(tile);
+    result.parent.tileCount = this.remains(tile);
     return result as HandWithParent;
   }
 
@@ -71,7 +71,7 @@ export class Hand {
   draw(tile: string): HandWithParent {
     const result = new Hand([...this.tiles, tile], this.predicate);
     result.parent = { hand: this, type: 'draw', tile, tileCount: -1 };
-    result.parent.tileCount = result.remains(tile);
+    result.parent.tileCount = this.remains(tile);
     return result as HandWithParent;
   }
 
