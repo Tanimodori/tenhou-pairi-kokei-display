@@ -35,8 +35,9 @@ export default class MJ {
    * i.e. not one of '50m50s50p', output as-is.
    */
   static toAka(input: string, force?: boolean) {
-    const [num, suit] = input;
-    if ('msp'.indexOf(suit) === -1) {
+    const num = input[0];
+    const suit = input[1];
+    if (suit !== 'm' && suit !== 'p' && suit !== 's') {
       return input;
     }
     if (num === '0' || num === '5') {
@@ -68,15 +69,23 @@ export default class MJ {
    * ```ts
    * MJ.compareTile('5s', '6s'); // -> -1
    * MJ.compareTile('5m', '5p'); // -> -1
-   * MJ.compareTile('5m', '0m'); // -> -1, '0m' is between '56m'
+   * MJ.compareTile('5m', '0m'); // -> -0.5, '0m' is between '56m'
    * ```
    */
-  static compareTile([aNum, aSuit]: string, [bNum, bSuit]: string) {
-    const order = '1234506789';
-    if (aSuit !== bSuit) {
-      return aSuit < bSuit ? -1 : 1;
+  static compareTile(a: string, b: string) {
+    if (a[1] !== b[1]) {
+      return a[1] < b[1] ? -1 : 1;
     } else {
-      return order.indexOf(aNum) - order.indexOf(bNum);
+      let aNum = a.charCodeAt(0);
+      let bNum = b.charCodeAt(0);
+      // '0'
+      if (aNum === 52) {
+        aNum = 57.5;
+      }
+      if (bNum === 52) {
+        bNum = 57.5;
+      }
+      return aNum - bNum;
     }
   }
 
@@ -159,7 +168,7 @@ export default class MJ {
   static splitSuits(source: readonly string[]): Suits {
     const result = {} as Suits;
     for (const suit of 'mpsz') {
-      result[suit] = MJ.normalize(source).filter((x) => x[1] === suit);
+      result[suit] = MJ.normalize(source.filter((x) => x[1] === suit));
     }
     return result;
   }
