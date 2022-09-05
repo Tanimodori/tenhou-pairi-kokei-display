@@ -63,7 +63,6 @@ export class Hand {
   discard(tile: string): HandWithParent {
     const result = new Hand(MJ.sub(this.tiles, tile), this.predicate);
     result.parent = { hand: this, type: 'discard', tile, tileCount: -1 };
-    result.parent.tileCount = this.remains(tile);
     return result as HandWithParent;
   }
 
@@ -71,7 +70,6 @@ export class Hand {
   draw(tile: string): HandWithParent {
     const result = new Hand([...this.tiles, tile], this.predicate);
     result.parent = { hand: this, type: 'draw', tile, tileCount: -1 };
-    result.parent.tileCount = this.remains(tile);
     return result as HandWithParent;
   }
 
@@ -192,6 +190,14 @@ export class Hand {
     });
   }
 
+  /** Mark parent.tileCount for children recursively */
+  markParentTileCount() {
+    for (const child of this.children) {
+      child.parent.tileCount = this.remains(child.parent.tile);
+      child.markParentTileCount();
+    }
+  }
+
   /**
    * Mock shanten calculation
    * @param shanten the pre-calculated shanten
@@ -204,9 +210,13 @@ export class Hand {
     }
     this.shanten = shanten;
     if (shanten === 0) {
-      return lengthMod3 === 2 ? this._0ShantenFull() : this._0ShantenPartial();
+      const result = lengthMod3 === 2 ? this._0ShantenFull() : this._0ShantenPartial();
+      this.markParentTileCount();
+      return result;
     } else if (shanten === 1) {
-      return lengthMod3 === 2 ? this._1ShantenFull() : this._1ShantenPartial();
+      const result = lengthMod3 === 2 ? this._1ShantenFull() : this._1ShantenPartial();
+      this.markParentTileCount();
+      return result;
     } else {
       return [];
     }
