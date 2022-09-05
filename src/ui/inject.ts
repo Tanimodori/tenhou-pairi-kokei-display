@@ -234,11 +234,10 @@ export const renderTableRow = (hand: HandWithParent) => {
     '摸[',
     koukeis.map(get0ShantenFullAnchors),
     koukeiCount ? `好形${koukeiCount}枚` : ``,
-    totalCount ? '+' : '',
+    koukeiCount && gukeiCount ? '+' : '',
     gukeis.map(get0ShantenFullAnchors),
     gukeiCount ? `愚形${gukeiCount}枚` : ``,
-    `=`,
-    `${totalCount}枚`,
+    `=${totalCount}枚`,
     `（好形率${Math.round((100 * koukeiCount) / totalCount)}%）`,
     ']',
   ];
