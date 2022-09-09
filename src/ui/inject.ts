@@ -177,14 +177,29 @@ export const renderTableLegacy = (tenpaikeis: Record<string, Iishanten>) => {
   }
 };
 
+/**
+ * Get the total count of parent tile of children
+ * @param children the children
+ * @returns total count of parent tiles available of all children
+ */
 export const getTotalTileCounts = (children: HandWithParent[]) => {
   return children.reduce((a, x) => a + x.parent.tileCount, 0);
 };
 
+/**
+ * Sort children by parent tile
+ * @param children the children
+ * @returns sorted children
+ */
 export const sortHandByParentTile = (children: HandWithParent[]) => {
   return children.sort((a, b) => MJ.compareTile(a.parent.tile, b.parent.tile));
 };
 
+/**
+ * Sort children by waiting counts and tile
+ * @param children the children
+ * @returns sorted children
+ */
 export const sortHandByParentTileAndCount = (children: HandWithParent[]) => {
   return children.sort((a, b) => {
     const aNum = getTotalTileCounts(a.children);
@@ -193,10 +208,20 @@ export const sortHandByParentTileAndCount = (children: HandWithParent[]) => {
   });
 };
 
+/**
+ * Generate anchor element of a full tenpai hand
+ * @param hand The tenpai full hand
+ * @returns the link anchor used in the row
+ */
 export const get0ShantenFullAnchors = (hand: HandWithParent) => {
   return create_node_tile_img(hand.parent.tile);
 };
 
+/**
+ * Determine a hand can have a koukei tenpai
+ * @param hand The full tenpai hand
+ * @returns `true` if the hand has any partial ten-pai hand waiting for more than 4 tiles.
+ */
 export const isKoukei = (hand: Hand) => {
   // hand is 0ShantenFull
   //  child is 0ShantenPartial
@@ -209,6 +234,11 @@ export const isKoukei = (hand: Hand) => {
   return false;
 };
 
+/**
+ * Generate row element of a partial hand of ii-shan-ten
+ * @param hand The partial hand of ii-shan-ten
+ * @returns The row element generated
+ */
 export const renderTableRow = (hand: HandWithParent) => {
   const tr = document.createElement('tr');
   // hand is 1ShantenPartial
@@ -254,6 +284,11 @@ export const renderTableRow = (hand: HandWithParent) => {
   return tr;
 };
 
+/**
+ * Create Table element from a calculated/mocked hand
+ * @param hand The calculated/mocked full ii-shan-ten hand
+ * @returns The table element created
+ */
 export const renderTable = (hand: Hand) => {
   const table = document.createElement('table');
   table.setAttribute('cellpadding', '2');
