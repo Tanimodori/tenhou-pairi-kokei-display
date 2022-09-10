@@ -1,4 +1,4 @@
-import { getUIInfo, inject_css, renderTableLegacy, UIInfo, TextareaInfo, renderTable } from '@/ui';
+import { getUIInfo, injectCss, renderTableLegacy, UIInfo, TextareaInfo, renderTable } from '@/ui';
 import { Hand } from './hand';
 import MJ from './MJ';
 
@@ -275,7 +275,7 @@ export const run = () => {
   }
 
   // inject css
-  inject_css();
+  injectCss();
 
   // calculate tenpaikei
   const tenpaikeis = getTenpaikeis(uiInfo);
