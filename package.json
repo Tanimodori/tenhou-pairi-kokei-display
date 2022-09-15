@@ -40,6 +40,6 @@
     "vitest": "^0.22.1"
   },
   "dependencies": {
-    "@tanimodori/mj-core": "^0.2.11-1"
+    "@tanimodori/mj-core": "^0.2.11-2"
   }
 }
