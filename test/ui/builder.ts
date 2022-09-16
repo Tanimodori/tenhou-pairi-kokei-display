@@ -1,6 +1,7 @@
-import { Window, Document, HTMLElement } from 'happy-dom';
+import { Window, Document } from 'happy-dom';
 import { mjcomp, mjtiles } from '@/legacy';
 import { UIInfo } from '@/ui';
+import { getElement } from '@/ui/utils';
 
 /** Test case for ui manipulation */
 export interface TestCaseInput {
@@ -66,43 +67,12 @@ export const buildTestCases = (inputs: TestCaseInput[]): TestCase[] => {
 };
 
 /**
- * Construct element for testing
- * @param document the document object
- * @param spec the spec of element
- */
-export const buildElement = (document: Document, spec: string | HTMLElement | Record<string, unknown>) => {
-  if (typeof spec === 'string') {
-    return document.createTextNode(spec);
-  }
-  if (spec instanceof HTMLElement) {
-    return spec;
-  }
-  const element = document.createElement(spec['_tag'] as string);
-  for (const key in spec) {
-    if (key === '_tag') {
-      continue;
-    } else if (key === '_class') {
-      element.className = spec[key] as string;
-    } else if (key === '_innerHTML') {
-      element.innerHTML = spec[key] as string;
-    } else if (key === '_children') {
-      const value = spec[key] as typeof spec[];
-      const children = value.map((x) => buildElement(document, x));
-      element.append(...children);
-    } else {
-      element.setAttribute(key, spec[key] as string);
-    }
-  }
-  return element;
-};
-
-/**
  * Build the input form of website
  * @param document the window document object
  * @param input the content of input
  */
 export const buildForm = (document: Document, input: string) => {
-  return buildElement(document, {
+  return getElement(document, {
     _tag: 'form',
     name: 'f',
     _children: [
@@ -138,7 +108,7 @@ export const getTenpaiText = (shanten: { standard: number; normal: number }) => 
  */
 export const buildHand = (document: Document, testCase: TestCase) => {
   const tiles = mjtiles(testCase.tiles).map((tile) =>
-    buildElement(document, {
+    getElement(document, {
       _tag: 'a',
       href: '?', // inaccurate
       _class: 'D',
@@ -146,7 +116,7 @@ export const buildHand = (document: Document, testCase: TestCase) => {
     }),
   );
   // result
-  return buildElement(document, {
+  return getElement(document, {
     _tag: 'div',
     id: 'tehai',
     _children: [getTenpaiText(testCase.calculated.shanten), { _tag: 'br' }, ...tiles],
@@ -166,14 +136,14 @@ export const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
   const tile2Id = (tile: string) => 'mpsz'.indexOf(tile[1]) * 9 + (tile[0] === '0' ? 4 : Number(tile[0])) - 1;
   const trs = testCase.calculated.result.map(([discard, tiles, count]) => {
     const tds = mjtiles(tiles).map((tile) =>
-      buildElement(document, {
+      getElement(document, {
         _tag: 'a',
         href: '?', // inaccurate
         _class: 'D',
         _children: [{ _tag: 'img', src: `https://cdn.tenhou.net/2/a/${tile}.gif` }],
       }),
     );
-    return buildElement(document, {
+    return getElement(document, {
       _tag: 'tr',
       id: `mda${tile2Id(discard)}`,
       _children: [
@@ -189,7 +159,7 @@ export const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
       ],
     });
   });
-  return buildElement(document, {
+  return getElement(document, {
     _tag: 'table',
     _children: [{ _tag: 'tbody', _children: trs }],
   });
@@ -217,7 +187,7 @@ export const buildM2Div = (document: Document, testCase: TestCase) => {
   const standardFormText = [`標準形(七対国士を含む)の計算結果 / `, `一般形`];
   const normalFormText = [`一般形(七対国士を含まない)の計算結果 / `, `標準形`];
   const formText = testCase.showAllResults ? standardFormText : normalFormText;
-  return buildElement(document, {
+  return getElement(document, {
     _tag: 'div',
     id: 'm2',
     _children: [
@@ -248,7 +218,7 @@ export const buildDocument = (testCase: TestCase) => {
   const window = new Window();
   const document = window.document;
   // create container
-  const container = buildElement(document, {
+  const container = getElement(document, {
     _tag: 'div',
     _children: [buildForm(document, testCase.input), buildHand(document, testCase), buildM2Div(document, testCase)],
   });
