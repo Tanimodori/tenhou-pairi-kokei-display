@@ -53,14 +53,28 @@ export interface ShantenTable {
   rows: ShantenRow[];
 }
 
+/**
+ * Get a shanten table element based on given config.
+ * @param config the config of table
+ */
 export function getShantenTable(config: ShantenTable): HTMLElement {
   // TODO
 }
 
+/**
+ * Get a shanten table row element based on given config.
+ * @param config the config of row
+ */
 export function getShantenRow(config: ShantenRow): HTMLElement {
   // TODO
 }
 
-export function getShantenRowTile(config: ShantenTile): HTMLElement {
+/**
+ * Get a shanten table row tile element based on given config.
+ * @param config the config of tile.
+ * * if `string`, render it as img element
+ * * if `ShantenTile`, render it as link elment
+ */
+export function getShantenRowTile(config: ShantenTile | string): HTMLElement {
   // TODO
 }
