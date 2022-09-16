@@ -1,5 +1,4 @@
-import { e } from 'vitest/dist/index-ea17aa0c';
-import { getElement } from '../utils';
+import { ElementSpec, getElement } from '../utils';
 
 /**
  * The type of tile drawn to form teipaikei.
@@ -36,6 +35,10 @@ export interface ShantenRow {
    * The tiles in the row.
    */
   tiles: ShantenTile[];
+  /**
+   * If true, display "待ち" on row, otherwise "摸".
+   */
+  tenpai?: boolean;
 }
 /**
  * The shanten table.
@@ -62,6 +65,25 @@ export interface ShantenTable {
  */
 export function getShantenTable(config: ShantenTable): HTMLElement {
   // TODO
+  const table = getElement({
+    _tag: 'table',
+    cellpadding: '2',
+    cellspacing: '0',
+    _children: [
+      {
+        _tag: 'tbody',
+        _children: config.rows.map(getShantenRow),
+      },
+    ],
+  }) as HTMLElement;
+  if (config.showHand) {
+    return getElement({
+      _tag: 'div',
+      children: [{ _tag: 'div', _children: config.hand.map(getShantenRowTile) }, table],
+    }) as HTMLElement;
+  } else {
+    return table;
+  }
 }
 
 /**
@@ -69,7 +91,85 @@ export function getShantenTable(config: ShantenTable): HTMLElement {
  * @param config the config of row
  */
 export function getShantenRow(config: ShantenRow): HTMLElement {
-  // TODO
+  // 1.  split
+  const tiles = splitRowTiles(config);
+  // 2.  childs
+  // 2.1 discard
+  const tdData: Array<ElementSpec[]> = [];
+  if (config.discard) {
+    tdData.push(['打']);
+    tdData.push([getShantenRowTile(config.discard)]);
+  }
+  tdData.push([config.tenpai ? '待ち' : '摸']);
+  // 2.2 koukei, gukei
+  let koukeiTotalCount: number | undefined;
+  let gukeiTotalCount: number | undefined;
+  const hasKoukei = tiles.koukei.length > 0;
+  const hasGukei = tiles.gukei.length > 0;
+  if (hasKoukei || hasGukei) {
+    // koukei
+    if (hasKoukei) {
+      tdData.push(tiles.koukei.map(getShantenRowTile));
+      koukeiTotalCount = tiles.koukei.reduce((a, x) => a + x.count, 0);
+      tdData.push([`好形${koukeiTotalCount}枚`]);
+    } else {
+      koukeiTotalCount = 0;
+      tdData.push([]);
+      tdData.push([]);
+    }
+    // +
+    tdData.push([hasKoukei && hasGukei ? '+' : '']);
+    // gukei
+    if (hasGukei) {
+      tdData.push(tiles.gukei.map(getShantenRowTile));
+      gukeiTotalCount = tiles.gukei.reduce((a, x) => a + x.count, 0);
+      tdData.push([`愚形${gukeiTotalCount}枚`]);
+    } else {
+      gukeiTotalCount = 0;
+      tdData.push([]);
+      tdData.push([]);
+    }
+    // =
+    tdData.push(['=']);
+  }
+  // 3.  other
+  const hasOther = tiles.other.length > 0;
+  if (hasOther) {
+    tdData.push(tiles.other.map(getShantenRowTile));
+  }
+  // 4.  total count
+  const totalCount = config.tiles.reduce((a, x) => a + x.count, 0);
+  tdData.push([`${totalCount}枚`]);
+  // 5.  total ratio
+  if (koukeiTotalCount !== undefined) {
+    const ratio = Math.round((100 * koukeiTotalCount) / totalCount);
+    tdData.push([`（好形率${ratio}%）`]);
+  }
+  tdData.push([']']);
+  // 6.  map and return
+  return getElement({
+    _tag: 'tr',
+    _children: tdData.map((x) => ({
+      _tag: 'td',
+      children: x,
+    })),
+  }) as HTMLElement;
+}
+
+function splitRowTiles(config: ShantenRow) {
+  const koukei: ShantenTile[] = [];
+  const gukei: ShantenTile[] = [];
+  const other: ShantenTile[] = [];
+  for (const tile of config.tiles) {
+    if (tile.type === 'koukei') {
+      koukei.push(tile);
+    } else if (tile.type === 'gukei') {
+      gukei.push(tile);
+    } else {
+      other.push(tile);
+    }
+  }
+  return { koukei, gukei, other };
 }
 
 /**
