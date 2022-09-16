@@ -60,10 +60,13 @@ export const renderTableRow = (hand: HandWithParent): ShantenRow => {
   const tiles: ShantenTile[] = [];
   // child is 0ShantenFull
   for (const child of hand.children) {
+    const queryType = hand.predicateFn === Hand.predicates.standard ? 'q' : 'p';
+    const queryStr = child.tiles.join('');
     tiles.push({
       type: isKoukei(child) ? 'koukei' : 'gukei',
       tile: child.parent.tile,
       count: child.parent.tileCount,
+      url: `https://tenhou.net/2/?${queryType}=${queryStr}`,
     });
   }
   return { discard: hand.parent.tile, tiles };

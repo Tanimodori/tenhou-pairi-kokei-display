@@ -187,8 +187,12 @@ export function getShantenRowTile(config: ShantenTile | string): HTMLElement {
       class: 'D',
     }) as HTMLElement;
   } else {
-    const element = getShantenRowTile(config.tile);
+    const result = getElement({
+      _tag: 'a',
+      href: config.url,
+      _children: [getShantenRowTile(config.tile)],
+    }) as HTMLElement;
     // TODO
-    return element;
+    return result;
   }
 }
