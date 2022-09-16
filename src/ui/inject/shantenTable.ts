@@ -1,3 +1,4 @@
+import MJ from '@/MJ';
 import { ElementSpec, getElement } from '../utils';
 
 /**
@@ -64,7 +65,7 @@ export interface ShantenTable {
  * @param config the config of table
  */
 export function getShantenTable(config: ShantenTable): HTMLElement {
-  // TODO
+  config.rows.sort(compareRow);
   const table = getElement({
     _tag: 'table',
     cellpadding: '2',
@@ -83,6 +84,20 @@ export function getShantenTable(config: ShantenTable): HTMLElement {
     }) as HTMLElement;
   } else {
     return table;
+  }
+}
+
+export function compareRow(a: ShantenRow, b: ShantenRow) {
+  const aNum = a.tiles.reduce((acc, x) => acc + x.count, 0);
+  const bNum = b.tiles.reduce((acc, x) => acc + x.count, 0);
+  if (aNum != bNum) {
+    return bNum - aNum;
+  } else {
+    if (a.discard && b.discard) {
+      return MJ.compareTile(a.discard, b.discard);
+    } else {
+      return 0;
+    }
   }
 }
 

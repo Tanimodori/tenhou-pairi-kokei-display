@@ -1,5 +1,4 @@
 import { Hand, HandWithParent } from '@/hand';
-import MJ from '@/MJ';
 import { getShantenTable, ShantenRow, ShantenTile } from './shantenTable';
 
 /**
@@ -9,28 +8,6 @@ import { getShantenTable, ShantenRow, ShantenTile } from './shantenTable';
  */
 export const getTotalTileCounts = (children: HandWithParent[]) => {
   return children.reduce((a, x) => a + x.parent.tileCount, 0);
-};
-
-/**
- * Sort children by parent tile
- * @param children the children
- * @returns sorted children
- */
-export const sortHandByParentTile = (children: HandWithParent[]) => {
-  return children.sort((a, b) => MJ.compareTile(a.parent.tile, b.parent.tile));
-};
-
-/**
- * Sort children by waiting counts and tile
- * @param children the children
- * @returns sorted children
- */
-export const sortHandByParentTileAndCount = (children: HandWithParent[]) => {
-  return children.sort((a, b) => {
-    const aNum = getTotalTileCounts(a.children);
-    const bNum = getTotalTileCounts(b.children);
-    return aNum !== bNum ? bNum - aNum : MJ.compareTile(a.parent.tile, b.parent.tile);
-  });
 };
 
 /**
@@ -78,12 +55,10 @@ export const renderTableRow = (hand: HandWithParent): ShantenRow => {
  * @returns The table element created
  */
 export const renderTable = (hand: Hand) => {
-  const children = sortHandByParentTileAndCount(hand.children);
   const config = {
     hand: hand.tiles,
     showHand: false,
-    rows: children.map(renderTableRow),
+    rows: hand.children.map(renderTableRow),
   };
-  console.log(config);
   return getShantenTable(config);
 };
