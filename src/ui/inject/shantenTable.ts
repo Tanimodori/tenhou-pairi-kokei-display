@@ -79,7 +79,7 @@ export function getShantenTable(config: ShantenTable): HTMLElement {
   if (config.showHand) {
     return getElement({
       _tag: 'div',
-      children: [{ _tag: 'div', _children: config.hand.map(getShantenRowTile) }, table],
+      _children: [{ _tag: 'div', _children: config.hand.map(getShantenRowTile) }, table],
     }) as HTMLElement;
   } else {
     return table;
@@ -100,7 +100,7 @@ export function getShantenRow(config: ShantenRow): HTMLElement {
     tdData.push(['打']);
     tdData.push([getShantenRowTile(config.discard)]);
   }
-  tdData.push([config.tenpai ? '待ち' : '摸']);
+  tdData.push([config.tenpai ? '待ち[' : '摸[']);
   // 2.2 koukei, gukei
   let koukeiTotalCount: number | undefined;
   let gukeiTotalCount: number | undefined;
@@ -151,7 +151,7 @@ export function getShantenRow(config: ShantenRow): HTMLElement {
     _tag: 'tr',
     _children: tdData.map((x) => ({
       _tag: 'td',
-      children: x,
+      _children: x,
     })),
   }) as HTMLElement;
 }

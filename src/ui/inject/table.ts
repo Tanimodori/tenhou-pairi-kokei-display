@@ -1,6 +1,6 @@
 import { Hand, HandWithParent } from '@/hand';
 import MJ from '@/MJ';
-import { create_node_tile_img } from './legacy';
+import { getShantenTable, ShantenRow, ShantenTile } from './shantenTable';
 
 /**
  * Get the total count of parent tile of children
@@ -34,15 +34,6 @@ export const sortHandByParentTileAndCount = (children: HandWithParent[]) => {
 };
 
 /**
- * Generate anchor element of a full tenpai hand
- * @param hand The tenpai full hand
- * @returns the link anchor used in the row
- */
-export const get0ShantenFullAnchors = (hand: HandWithParent) => {
-  return create_node_tile_img(hand.parent.tile);
-};
-
-/**
  * Determine a hand can have a koukei tenpai
  * @param hand The full tenpai hand
  * @returns `true` if the hand has any partial ten-pai hand waiting for more than 4 tiles.
@@ -64,49 +55,18 @@ export const isKoukei = (hand: Hand) => {
  * @param hand The partial hand of ii-shan-ten
  * @returns The row element generated
  */
-export const renderTableRow = (hand: HandWithParent) => {
-  const tr = document.createElement('tr');
+export const renderTableRow = (hand: HandWithParent): ShantenRow => {
   // hand is 1ShantenPartial
-  let koukeis: HandWithParent[] = [];
-  let gukeis: HandWithParent[] = [];
+  const tiles: ShantenTile[] = [];
   // child is 0ShantenFull
   for (const child of hand.children) {
-    const isChildKoukei = isKoukei(child);
-    if (isChildKoukei) {
-      koukeis.push(child);
-    } else {
-      gukeis.push(child);
-    }
+    tiles.push({
+      type: isKoukei(child) ? 'koukei' : 'gukei',
+      tile: child.parent.tile,
+      count: child.parent.tileCount,
+    });
   }
-  koukeis = sortHandByParentTile(koukeis);
-  gukeis = sortHandByParentTile(gukeis);
-  const koukeiCount = getTotalTileCounts(koukeis);
-  const gukeiCount = getTotalTileCounts(gukeis);
-  const totalCount = koukeiCount + gukeiCount;
-  const tdDatas = [
-    '打',
-    create_node_tile_img(hand.parent.tile),
-    '摸[',
-    koukeis.map(get0ShantenFullAnchors),
-    koukeiCount ? `好形${koukeiCount}枚` : ``,
-    koukeiCount && gukeiCount ? '+' : '',
-    gukeis.map(get0ShantenFullAnchors),
-    gukeiCount ? `愚形${gukeiCount}枚` : ``,
-    `=${totalCount}枚`,
-    `（好形率${Math.round((100 * koukeiCount) / totalCount)}%）`,
-    ']',
-  ];
-  const tds = tdDatas.map((data) => {
-    const td = document.createElement('td');
-    if (Array.isArray(data)) {
-      td.append(...data);
-    } else {
-      td.append(data);
-    }
-    return td;
-  });
-  tr.append(...tds);
-  return tr;
+  return { discard: hand.parent.tile, tiles };
 };
 
 /**
@@ -115,14 +75,12 @@ export const renderTableRow = (hand: HandWithParent) => {
  * @returns The table element created
  */
 export const renderTable = (hand: Hand) => {
-  const table = document.createElement('table');
-  table.setAttribute('cellpadding', '2');
-  table.setAttribute('cellspacing', '0');
-  const tbody = document.createElement('tbody');
   const children = sortHandByParentTileAndCount(hand.children);
-  for (const child of children) {
-    tbody.append(renderTableRow(child));
-  }
-  table.appendChild(tbody);
-  return table;
+  const config = {
+    hand: hand.tiles,
+    showHand: false,
+    rows: children.map(renderTableRow),
+  };
+  console.log(config);
+  return getShantenTable(config);
 };
