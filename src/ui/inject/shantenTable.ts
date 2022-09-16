@@ -44,7 +44,23 @@ export interface ShantenTable {
    */
   hand: string[];
   /**
+   * Display hand or not.
+   */
+  showHand?: boolean;
+  /**
    * The rows in the table.
    */
   rows: ShantenRow[];
+}
+
+export function getShantenTable(config: ShantenTable): HTMLElement {
+  // TODO
+}
+
+export function getShantenRow(config: ShantenRow): HTMLElement {
+  // TODO
+}
+
+export function getShantenRowTile(config: ShantenTile): HTMLElement {
+  // TODO
 }
