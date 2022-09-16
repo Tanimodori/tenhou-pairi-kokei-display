@@ -1,18 +1,13 @@
 import { Iishanten, mjcomp, mjtiles, MJ_TILES, Tenpaikei } from '@/legacy';
+import { getShantenRowTile } from './shantenTable';
 
 /**
  * Creating tile image element of given tile
  * @param tile the tile
- * @param setClass whether or not set class of img
  * @returns the image element
+ * @deprecated
  */
-export const create_node_tile_img = (tile: string, setClass = false) => {
-  const img_node = document.createElement('img');
-  img_node.setAttribute('src', 'https://cdn.tenhou.net/2/a/' + tile + '.gif');
-  img_node.setAttribute('border', '0');
-  setClass && img_node.setAttribute('class', 'D');
-  return img_node;
-};
+export const create_node_tile_img = getShantenRowTile;
 
 /**
  * Create a hyperlink element with image element children of giben tile

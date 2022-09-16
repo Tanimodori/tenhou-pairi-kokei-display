@@ -1,3 +1,6 @@
+import { e } from 'vitest/dist/index-ea17aa0c';
+import { getElement } from '../utils';
+
 /**
  * The type of tile drawn to form teipaikei.
  *
@@ -76,5 +79,16 @@ export function getShantenRow(config: ShantenRow): HTMLElement {
  * * if `ShantenTile`, render it as link elment
  */
 export function getShantenRowTile(config: ShantenTile | string): HTMLElement {
-  // TODO
+  if (typeof config === 'string') {
+    return getElement({
+      _tag: 'img',
+      src: `https://cdn.tenhou.net/2/a/${config}.gif`,
+      border: '0',
+      class: 'D',
+    }) as HTMLElement;
+  } else {
+    const element = getShantenRowTile(config.tile);
+    // TODO
+    return element;
+  }
 }

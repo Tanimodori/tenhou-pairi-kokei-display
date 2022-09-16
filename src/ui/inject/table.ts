@@ -85,7 +85,7 @@ export const renderTableRow = (hand: HandWithParent) => {
   const totalCount = koukeiCount + gukeiCount;
   const tdDatas = [
     '打',
-    create_node_tile_img(hand.parent.tile, true),
+    create_node_tile_img(hand.parent.tile),
     '摸[',
     koukeis.map(get0ShantenFullAnchors),
     koukeiCount ? `好形${koukeiCount}枚` : ``,
