@@ -1,4 +1,4 @@
-import { mjcomp, mjtiles } from '@/legacy';
+import MJ from '@/MJ';
 
 export interface TextareaInfo {
   /**
@@ -134,17 +134,17 @@ export const parseTextareaContent = (content: string) => {
   };
   if (matches) {
     // the hand
-    result.hand = mjtiles(matches[0]);
+    result.hand = MJ.toArray(matches[0]);
     // check if the content contains discards
     if (content.indexOf('打') !== -1) {
       // have discards
       for (let i = 1; i < matches.length; i += 2) {
-        result.waitings.push({ discard: matches[i], tiles: mjtiles(matches[i + 1]) });
+        result.waitings.push({ discard: matches[i], tiles: MJ.toArray(matches[i + 1]) });
       }
     } else {
       // no discards
       for (let i = 1; i < matches.length; ++i) {
-        result.waitings.push({ tiles: mjtiles(matches[i]) });
+        result.waitings.push({ tiles: MJ.toArray(matches[i]) });
       }
     }
   }
@@ -168,7 +168,7 @@ export const getTextareaTiles = () => {
  */
 export const getUIInfo = () => {
   const shanten = getShantenInfo();
-  const hand = getTiles().sort(mjcomp);
+  const hand = getTiles().sort(MJ.compareTile);
   const waitingInfo = getTextareaTiles();
   const result: UIInfo = {
     shanten,
