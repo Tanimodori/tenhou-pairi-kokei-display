@@ -1,84 +1,58 @@
 import { describe, it, expect } from 'vitest';
-import {
-  type MJArray,
-  resetMjagari,
-  mj13orphan,
-  mj7toi,
-  mjaka,
-  mjcomp,
-  mjsub,
-  mjtiles,
-  mjagari,
-  mjnokori,
-  mjmachi,
-  mjtenpaikei,
-  Tenpaikei,
-} from 'src/legacy';
+import MJ from '@/MJ';
+import { Hand } from '@/hand';
 
-describe('mjtiles', () => {
+describe('MJ.toArray', () => {
   it('can split tiles', () => {
-    expect(mjtiles('12m3s0p5z')).toEqual(['1m', '2m', '3s', '0p', '5z']);
+    expect(MJ.toArray('12m3s0p5z')).toEqual(['1m', '2m', '3s', '0p', '5z']);
   });
 });
 
-describe('mjcomp', () => {
+describe('MJ.compareTile', () => {
   it('can compare tiles', () => {
     // same suite
-    expect(mjcomp('5s', '6s')).toBeLessThan(0);
-    expect(mjcomp('5s', '5s')).toEqual(0);
-    expect(mjcomp('5s', '0s')).toBeLessThan(0);
-    expect(mjcomp('0s', '6s')).toBeLessThan(0);
+    expect(MJ.compareTile('5s', '6s')).toBeLessThan(0);
+    expect(MJ.compareTile('5s', '5s')).toEqual(0);
+    expect(MJ.compareTile('5s', '0s')).toBeLessThan(0);
+    expect(MJ.compareTile('0s', '6s')).toBeLessThan(0);
     // different suite
-    expect(mjcomp('9m', '1p')).toBeLessThan(0);
-    expect(mjcomp('9p', '1s')).toBeLessThan(0);
-    expect(mjcomp('9s', '1z')).toBeLessThan(0);
+    expect(MJ.compareTile('9m', '1p')).toBeLessThan(0);
+    expect(MJ.compareTile('9p', '1s')).toBeLessThan(0);
+    expect(MJ.compareTile('9s', '1z')).toBeLessThan(0);
   });
 });
 
-describe('mjaka', () => {
+describe('MJ.toAka', () => {
   it('can convert akadoras', () => {
-    expect(mjaka('5m')).toBe('0m');
-    expect(mjaka('0m')).toBe('5m');
-    expect(mjaka('5z')).toBe('5z');
-    expect(mjaka('6s')).toBe('6s');
+    expect(MJ.toAka('5m')).toBe('0m');
+    expect(MJ.toAka('0m')).toBe('5m');
+    expect(MJ.toAka('5z')).toBe('5z');
+    expect(MJ.toAka('6s')).toBe('6s');
   });
 });
 
-describe('mjsub', () => {
+describe('MJ.sub', () => {
   const getHand = (tiles = '456s50p') => {
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
+    const hand = MJ.toArray(tiles);
     return hand;
   };
 
-  it('should skip failed hand', () => {
-    const hand = getHand();
-    hand.mjfail = true;
-    // TODO: return undefined is not a good practice
-    expect(mjsub(hand)).toEqual(undefined);
-  });
-
   it('can subtract tiles', () => {
     const hand = getHand();
-    expect(mjsub(hand, '5s')).toEqual(getHand('46s50p'));
+    expect(MJ.sub(hand, '5s')).toEqual(getHand('46s50p'));
   });
 
   it('subtracts akadoras when necessary', () => {
-    expect(mjsub(getHand(), '0s')).toEqual(getHand('46s50p'));
-    expect(mjsub(getHand(), '5p')).toEqual(getHand('456s0p'));
-    expect(mjsub(getHand(), '5p', '5p')).toEqual(getHand('456s'));
-  });
-
-  it('should fail when no tile can be subtracted', () => {
-    expect(mjsub(getHand(), '5z')?.mjfail).toBe(true);
+    expect(MJ.sub(getHand(), '0s')).toEqual(getHand('46s50p'));
+    expect(MJ.sub(getHand(), '5p')).toEqual(getHand('456s0p'));
+    expect(MJ.sub(getHand(), '5p', '5p')).toEqual(getHand('456s'));
   });
 });
 
-describe('mj7toi', () => {
+describe('MJ.is7Pairs', () => {
   const testHand = (tiles: string) => {
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
-    return mj7toi(hand);
+    const hand = MJ.toArray(tiles);
+    return MJ.is7Pairs(hand);
   };
   it('should calculate winning hands correctly', () => {
     // normal hands is not 7 pairs
@@ -97,11 +71,10 @@ describe('mj7toi', () => {
   });
 });
 
-describe('mj13orphan', () => {
+describe('MJ.is13Orphans', () => {
   const testHand = (tiles: string) => {
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
-    return mj13orphan(hand);
+    const hand = MJ.toArray(tiles);
+    return MJ.is13Orphans(hand);
   };
   it('can calculate winning hands', () => {
     // normal hands is not 13 orphans
@@ -115,12 +88,14 @@ describe('mj13orphan', () => {
   });
 });
 
-describe('mjagari', () => {
+describe('isWinHand', () => {
   const testHand = (tiles: string, show_all_result = true) => {
-    resetMjagari(show_all_result);
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
-    return mjagari(hand, show_all_result);
+    const hand = MJ.toArray(tiles);
+    if (show_all_result) {
+      return MJ.isWinHand(hand);
+    } else {
+      return MJ.isNormalWinHand(hand);
+    }
   };
 
   // [hand, standard, normal]
@@ -136,28 +111,31 @@ describe('mjagari', () => {
   });
 });
 
-describe('mjnokori', () => {
+describe('MJ.remains', () => {
   const getHand = (tiles = '15m50p550s5555z') => {
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
+    const hand = MJ.toArray(tiles);
     return hand;
   };
   it('can calculate remaining tile count', () => {
     const hand = getHand();
-    expect(mjnokori(hand, '1m')).toBe(3);
-    expect(mjnokori(hand, '0m')).toBe(3);
-    expect(mjnokori(hand, '5p')).toBe(2);
-    expect(mjnokori(hand, '5s')).toBe(1);
-    expect(mjnokori(hand, '5z')).toBe(0);
+    expect(MJ.remains(hand, '1m')).toBe(3);
+    expect(MJ.remains(hand, '0m')).toBe(3);
+    expect(MJ.remains(hand, '5p')).toBe(2);
+    expect(MJ.remains(hand, '5s')).toBe(1);
+    expect(MJ.remains(hand, '5z')).toBe(0);
   });
 });
 
-describe('mjmachi', () => {
+describe('hand._0ShantenPartial (machi)', () => {
   const testHand = (tiles: string, show_all_result = true) => {
-    resetMjagari(show_all_result);
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
-    return mjmachi(hand);
+    const hand = new Hand(tiles);
+    if (show_all_result) {
+      hand.predicate = 'standard';
+    } else {
+      hand.predicate = 'normal';
+    }
+    hand._0ShantenPartial();
+    return hand.children.map((x) => x.parent.tile);
   };
 
   // [hand, standard, normal]
@@ -229,49 +207,54 @@ describe('mjmachi', () => {
   ];
 
   it.each(cases)('can calulate waiting tiles', (hand, standard, normal) => {
-    expect(testHand(hand)).toEqual(mjtiles(standard));
-    expect(testHand(hand, false)).toEqual(mjtiles(normal));
+    expect(testHand(hand)).toEqual(MJ.toArray(standard));
+    expect(testHand(hand, false)).toEqual(MJ.toArray(normal));
   });
 });
 
-describe('mjtenpaikei', () => {
-  const testHand = (tiles: string, show_all_result = true) => {
-    resetMjagari(show_all_result);
-    const hand = mjtiles(tiles) as MJArray;
-    hand.mjfail = false;
-    return mjtenpaikei(hand);
+describe('hand._0ShantenPartial (machi)', () => {
+  type Answer = Record<string, Record<string, number>>;
+  const testHand = (tiles: string) => {
+    const hand = new Hand(tiles);
+    hand._0ShantenFull();
+    hand.markParentTileCount();
+    const result: Answer = {};
+    for (const child of hand.children) {
+      const temp: Record<string, number> = {};
+      for (const grandChild of child.children) {
+        temp[grandChild.parent.tile] = grandChild.parent.tileCount;
+      }
+      result[child.parent.tile] = temp;
+    }
+    return result;
   };
 
-  const cases: [string, Tenpaikei][] = [
+  const cases: [string, Answer][] = [
     // no-ten
-    ['123456789m258p11z', { nokori_max: 0 }],
+    ['123456789m258p11z', {}],
     // normal
     [
       '123456789m235p11z',
       {
-        nokori_max: 8,
-        '5p': { nokori: 8, '1p': 4, '4p': 4 },
-        '2p': { nokori: 4, '4p': 4 },
+        '5p': { '1p': 4, '4p': 4 },
+        '2p': { '4p': 4 },
       },
     ],
     // 7 pairs
     [
       '1122m3344556678p',
       {
-        nokori_max: 4,
-        '3p': { nokori: 4, '1m': 2, '2m': 2 },
-        '6p': { nokori: 4, '1m': 2, '2m': 2 },
-        '7p': { nokori: 3, '8p': 3 },
-        '8p': { nokori: 3, '7p': 3 },
+        '3p': { '1m': 2, '2m': 2 },
+        '6p': { '1m': 2, '2m': 2 },
+        '7p': { '8p': 3 },
+        '8p': { '7p': 3 },
       },
     ],
     // 13 orphans
     [
       '19m19p159s1234567z',
       {
-        nokori_max: 39,
         '5s': {
-          nokori: 39,
           '1m': 3,
           '9m': 3,
           '1s': 3,
