@@ -1,6 +1,6 @@
 {
   "name": "tenhou-pairi-kokei-display",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Display Kokei percentage of ii-shan-ten in Tenhou-Pairi",
   "main": "dist/index.js",
   "files": [
