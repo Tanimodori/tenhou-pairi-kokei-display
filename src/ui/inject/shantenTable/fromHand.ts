@@ -1,5 +1,6 @@
 import { Hand, HandWithParent } from '@/hand';
-import { getShantenTable, ShantenRow, ShantenTile } from './shantenTable';
+import { getShantenTable } from './render';
+import { ShantenRow, ShantenTile } from './types';
 
 /**
  * Get the total count of parent tile of children
@@ -32,7 +33,7 @@ export const isKoukei = (hand: Hand) => {
  * @param hand The partial hand of ii-shan-ten
  * @returns The row element generated
  */
-export const renderTableRow = (hand: HandWithParent): ShantenRow => {
+export const getRowConfigFromHand = (hand: HandWithParent): ShantenRow => {
   // hand is 1ShantenPartial
   const tiles: ShantenTile[] = [];
   // child is 0ShantenFull
@@ -54,11 +55,11 @@ export const renderTableRow = (hand: HandWithParent): ShantenRow => {
  * @param hand The calculated/mocked full ii-shan-ten hand
  * @returns The table element created
  */
-export const renderTable = (hand: Hand) => {
+export const getTableConfigFromHand = (hand: Hand) => {
   const config = {
     hand: hand.tiles,
     showHand: false,
-    rows: hand.children.map(renderTableRow),
+    rows: hand.children.map(getRowConfigFromHand),
   };
   return getShantenTable(config);
 };

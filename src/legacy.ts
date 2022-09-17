@@ -1,4 +1,4 @@
-import { getUIInfo, injectCss, renderTableLegacy, UIInfo, TextareaInfo, renderTable } from '@/ui';
+import { getUIInfo, injectCss, renderTableLegacy, UIInfo, TextareaInfo, getTableConfigFromHand } from '@/ui';
 import { Hand } from './hand';
 import MJ from './MJ';
 
@@ -284,5 +284,5 @@ export const run = () => {
 
   const hand = new Hand(uiInfo.hand, queryType);
   hand.mockShanten(1);
-  document.querySelector('#m2 > table')?.after(renderTable(hand));
+  document.querySelector('#m2 > table')?.after(getTableConfigFromHand(hand));
 };

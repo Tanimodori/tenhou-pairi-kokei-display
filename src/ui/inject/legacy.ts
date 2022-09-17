@@ -1,5 +1,5 @@
 import { Iishanten, mjcomp, mjtiles, MJ_TILES, Tenpaikei } from '@/legacy';
-import { getShantenRowTile } from './shantenTable';
+import { getShantenRowTile } from './shantenTable/render';
 
 /**
  * Creating tile image element of given tile
