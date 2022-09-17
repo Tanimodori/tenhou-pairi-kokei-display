@@ -22,7 +22,8 @@ export function getShantenTable(config: ShantenTable): HTMLElement {
   if (config.showHand) {
     return getElement({
       _tag: 'div',
-      _children: [{ _tag: 'div', _class: 'popup', _children: config.hand.map(getShantenRowTile) }, table],
+      _class: 'popup',
+      _children: [{ _tag: 'div', _class: 'popup-tile', _children: config.hand.map(getShantenRowTile) }, table],
     }) as HTMLElement;
   } else {
     return table;
@@ -146,6 +147,7 @@ export function getShantenRowTile(config: ShantenTile | string): HTMLElement {
   } else {
     const result = getElement({
       _tag: 'a',
+      _class: 'shanten-tile',
       href: config.url,
       _children: [getShantenRowTile(config.tile)],
     }) as HTMLElement;
