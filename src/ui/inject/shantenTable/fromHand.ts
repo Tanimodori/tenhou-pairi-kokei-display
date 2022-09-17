@@ -1,6 +1,5 @@
 import { Hand, HandWithParent } from '@/hand';
-import { getShantenTable } from './render';
-import { ShantenRow, ShantenTile } from './types';
+import { ShantenRow, ShantenTable, ShantenTile, ShantenTileType } from './types';
 
 /**
  * Get the total count of parent tile of children
@@ -29,6 +28,17 @@ export const isKoukei = (hand: Hand) => {
 };
 
 /**
+ * Get the url to query hand input on tenhou.net
+ * @param hand the hand input
+ * @returns generated url
+ */
+export const getHandUrl = (hand: Hand) => {
+  const queryType = hand.predicateFn === Hand.predicates.standard ? 'q' : 'p';
+  const queryStr = hand.tiles.join('');
+  return `https://tenhou.net/2/?${queryType}=${queryStr}`;
+};
+
+/**
  * Generate row element of a partial hand of ii-shan-ten
  * @param hand The partial hand of ii-shan-ten
  * @returns The row element generated
@@ -38,14 +48,24 @@ export const getRowConfigFromHand = (hand: HandWithParent): ShantenRow => {
   const tiles: ShantenTile[] = [];
   // child is 0ShantenFull
   for (const child of hand.children) {
-    const queryType = hand.predicateFn === Hand.predicates.standard ? 'q' : 'p';
-    const queryStr = child.tiles.join('');
-    tiles.push({
-      type: isKoukei(child) ? 'koukei' : 'gukei',
+    // compute koukei/gukei
+    let tileType: ShantenTileType = null;
+    if (hand.shanten === 1) {
+      tileType = isKoukei(child) ? 'koukei' : 'gukei';
+    }
+    const tileConfig: ShantenTile = {
+      type: tileType,
       tile: child.parent.tile,
       count: child.parent.tileCount,
-      url: `https://tenhou.net/2/?${queryType}=${queryStr}`,
-    });
+      url: getHandUrl(child),
+    };
+    // generate subtable
+    if (hand.shanten === 1) {
+      const table = getTableConfigFromHand(child);
+      table.showHand = true;
+      tileConfig.child = table;
+    }
+    tiles.push(tileConfig);
   }
   return { discard: hand.parent.tile, tiles };
 };
@@ -55,11 +75,11 @@ export const getRowConfigFromHand = (hand: HandWithParent): ShantenRow => {
  * @param hand The calculated/mocked full ii-shan-ten hand
  * @returns The table element created
  */
-export const getTableConfigFromHand = (hand: Hand) => {
+export const getTableConfigFromHand = (hand: Hand): ShantenTable => {
   const config = {
     hand: hand.tiles,
     showHand: false,
     rows: hand.children.map(getRowConfigFromHand),
   };
-  return getShantenTable(config);
+  return config;
 };

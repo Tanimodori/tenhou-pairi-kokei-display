@@ -22,7 +22,7 @@ export function getShantenTable(config: ShantenTable): HTMLElement {
   if (config.showHand) {
     return getElement({
       _tag: 'div',
-      _children: [{ _tag: 'div', _children: config.hand.map(getShantenRowTile) }, table],
+      _children: [{ _tag: 'div', _class: 'popup', _children: config.hand.map(getShantenRowTile) }, table],
     }) as HTMLElement;
   } else {
     return table;
@@ -149,7 +149,11 @@ export function getShantenRowTile(config: ShantenTile | string): HTMLElement {
       href: config.url,
       _children: [getShantenRowTile(config.tile)],
     }) as HTMLElement;
-    // TODO
+    // childTable
+    if (config.child) {
+      const childTable = getShantenTable(config.child);
+      result.appendChild(childTable);
+    }
     return result;
   }
 }
