@@ -146,10 +146,15 @@ export function getShantenRowTile(config: ShantenTile | string): HTMLElement {
     }) as HTMLElement;
   } else {
     const result = getElement({
-      _tag: 'a',
+      _tag: 'span',
       _class: 'shanten-tile',
-      href: config.url,
-      _children: [getShantenRowTile(config.tile)],
+      _children: [
+        {
+          _tag: 'a',
+          href: config.url,
+          _children: [getShantenRowTile(config.tile)],
+        },
+      ],
     }) as HTMLElement;
     // childTable
     if (config.child) {
