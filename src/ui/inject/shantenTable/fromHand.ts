@@ -67,7 +67,7 @@ export const getRowConfigFromHand = (hand: HandWithParent): ShantenRow => {
     }
     tiles.push(tileConfig);
   }
-  return { discard: hand.parent.tile, tiles };
+  return { discard: hand.parent.tile, tiles, tenpai: hand.shanten === 0 };
 };
 
 /**
