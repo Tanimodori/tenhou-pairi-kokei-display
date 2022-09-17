@@ -28,6 +28,12 @@ export const run = () => {
     return;
   }
 
+  // detect original table
+  const originalTable = document.querySelector('#m2 > table');
+  if (!originalTable) {
+    return;
+  }
+
   // inject css
   injectCss();
 
@@ -40,5 +46,6 @@ export const run = () => {
   const table = getShantenTable(tableConfig);
 
   // inject table
-  document.querySelector('#m2 > table')?.after(table);
+  originalTable.after(table);
+  originalTable.remove();
 };
