@@ -1,4 +1,4 @@
-import { run } from '@/legacy';
+import { run } from '@/entry';
 import { describe, vi, it } from 'vitest';
 import { buildDocument } from './builder';
 import { testCases } from './cases';

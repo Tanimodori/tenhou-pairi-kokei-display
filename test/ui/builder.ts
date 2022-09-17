@@ -1,7 +1,7 @@
 import { Window, Document } from 'happy-dom';
-import { mjcomp, mjtiles } from '@/legacy';
 import { UIInfo } from '@/ui';
 import { getElement } from '@/ui/utils';
+import MJ from '@/MJ';
 
 /** Test case for ui manipulation */
 export interface TestCaseInput {
@@ -107,7 +107,7 @@ export const getTenpaiText = (shanten: { standard: number; normal: number }) => 
  * @param testCase the test case
  */
 export const buildHand = (document: Document, testCase: TestCase) => {
-  const tiles = mjtiles(testCase.tiles).map((tile) =>
+  const tiles = MJ.toArray(testCase.tiles).map((tile) =>
     getElement(document, {
       _tag: 'a',
       href: '?', // inaccurate
@@ -135,7 +135,7 @@ export const buildTeipaikeiTable = (document: Document, testCase: TestCase) => {
    */
   const tile2Id = (tile: string) => 'mpsz'.indexOf(tile[1]) * 9 + (tile[0] === '0' ? 4 : Number(tile[0])) - 1;
   const trs = testCase.calculated.result.map(([discard, tiles, count]) => {
-    const tds = mjtiles(tiles).map((tile) =>
+    const tds = MJ.toArray(tiles).map((tile) =>
       getElement(document, {
         _tag: 'a',
         href: '?', // inaccurate
@@ -173,7 +173,7 @@ export const buildTextareaContent = (testCase: TestCase) => {
   // It uses `testCase.input`, not `testCase.tiles`
   const firstLine = `${testCase.input}\n`;
   const mainLines = testCase.calculated.result.map(
-    ([discard, tiles, count]) => `打${discard} 摸[${mjtiles(tiles).join('')} ${count}枚]`,
+    ([discard, tiles, count]) => `打${discard} 摸[${MJ.toArray(tiles).join('')} ${count}枚]`,
   );
   return firstLine + mainLines.join('\n');
 };
@@ -232,18 +232,18 @@ export const buildDocument = (testCase: TestCase) => {
  * @param testCase test case
  */
 export const buildUIinfo = (testCase: TestCase) => {
-  const inputTiles = mjtiles(testCase.input);
-  const handTiles = mjtiles(testCase.tiles);
+  const inputTiles = MJ.toArray(testCase.input);
+  const handTiles = MJ.toArray(testCase.tiles);
   const result: UIInfo = {
     query: {
       type: testCase.showAllResults ? 'standard' : 'normal',
       autofill: inputTiles.length !== handTiles.length,
     },
     shanten: testCase.calculated.shanten,
-    hand: handTiles.sort(mjcomp),
+    hand: handTiles.sort(MJ.compareTile),
     waitings: testCase.calculated.result.map(([discard, tiles]) => ({
       discard,
-      tiles: mjtiles(tiles),
+      tiles: MJ.toArray(tiles),
     })),
   };
   return result;
