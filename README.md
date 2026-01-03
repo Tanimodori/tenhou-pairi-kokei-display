@@ -1,4 +1,7 @@
 # tenhou-pairi-kokei-display
+
+## → Moved to [Tanimodori/tampermonkey-scripts](https://github.com/Tanimodori/tampermonkey-scripts)
+
 Display Kokei percentage of ii-shan-ten in [Tenhou-Pairi](https://tenhou.net/2).
 
 ![TS100%](https://badgen.net/badge/TypeScript/100%25/3178C6?icon=typescript)
